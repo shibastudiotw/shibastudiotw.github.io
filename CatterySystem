@@ -1,0 +1,580 @@
+import React, { useState } from 'react';
+import { 
+  Cat, 
+  Dna, 
+  Syringe, 
+  FileText, 
+  Users, 
+  Calendar, 
+  Search, 
+  Bell, 
+  ChevronRight, 
+  CheckCircle, 
+  AlertCircle,
+  Heart,
+  Settings,
+  Menu,
+  X,
+  Printer
+} from 'lucide-react';
+
+// --- Mock Data ---
+
+const MOCK_STATS = [
+  { label: '現役種貓', value: '12', sub: '公 4 / 母 8', color: 'bg-blue-500' },
+  { label: '在舍幼貓', value: '8', sub: '待找家 3', color: 'bg-pink-500' },
+  { label: '本月預產', value: '2', sub: '預計 8-10 隻', color: 'bg-purple-500' },
+  { label: '待回訪家長', value: '5', sub: '今日需聯繫 2', color: 'bg-orange-500' },
+];
+
+const MOCK_BREEDING_CATS = [
+  { id: 1, name: 'GC RW StarPaws Leo', gender: '公', breed: '英國短毛貓 (NY12)', regNumber: 'TICA-SB-11203', status: '現役', image: '🦁' },
+  { id: 2, name: 'CH Galaxy Luna', gender: '母', breed: '英國短毛貓 (NY25)', regNumber: 'WCF-RU-99821', status: '懷孕中 (45天)', image: '🌙' },
+  { id: 3, name: 'StarPaws Bella', gender: '母', breed: '布偶貓 (雙色)', regNumber: 'CFA-2291', status: '休養中', image: '🎀' },
+];
+
+const MOCK_LITTERS = [
+  { id: 'L-2023-A', sire: 'Leo', dam: 'Luna', date: '2023-12-10', count: 4, status: '哺乳中' },
+  { id: 'L-2024-B', sire: 'Leo', dam: 'Bella', date: '2024-02-15', count: 0, status: '預產期' },
+];
+
+const MOCK_HEALTH_RECORDS = [
+  { id: 101, name: '小金 (Green)', litter: 'L-2023-A', age: '45天', weight: '650g', vaccineStatus: '第一劑已打', nextVaccine: '2024-01-25', status: '健康' },
+  { id: 102, name: '小銀 (Blue)', litter: 'L-2023-A', age: '45天', weight: '620g', vaccineStatus: '第一劑已打', nextVaccine: '2024-01-25', status: '健康' },
+  { id: 103, name: '小紅 (Red)', litter: 'L-2023-A', age: '45天', weight: '580g', vaccineStatus: '延遲', nextVaccine: '2024-01-28', status: '觀察中 (軟便)' },
+];
+
+const MOCK_OWNERS = [
+  { id: 1, name: '陳小姐', cat: '小金', phone: '0912-345-678', lastContact: '2024-01-10', nextContact: '2024-01-17', note: '新手家長，需教導餵食' },
+  { id: 2, name: '林先生', cat: 'Cooper (已離舍)', phone: '0988-111-222', lastContact: '2023-12-01', nextContact: '2024-03-01', note: '結紮追蹤' },
+];
+
+// --- Components ---
+
+const Card = ({ children, className = "" }) => (
+  <div className={`bg-white rounded-xl shadow-sm border border-slate-100 p-6 ${className}`}>
+    {children}
+  </div>
+);
+
+const Badge = ({ children, type = 'default' }) => {
+  const styles = {
+    default: 'bg-slate-100 text-slate-600',
+    success: 'bg-green-100 text-green-700',
+    warning: 'bg-amber-100 text-amber-700',
+    danger: 'bg-rose-100 text-rose-700',
+    info: 'bg-blue-100 text-blue-700',
+    purple: 'bg-purple-100 text-purple-700',
+  };
+  return (
+    <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[type] || styles.default}`}>
+      {children}
+    </span>
+  );
+};
+
+export default function CatteryManagement() {
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // --- Views ---
+
+  const DashboardView = () => (
+    <div className="space-y-6 animate-fade-in">
+      {/* Welcome Banner */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-800">早安，主理人</h2>
+          <p className="text-slate-500">今日貓舍狀況概覽 - Building Cattery System v1.0</p>
+        </div>
+        <button className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition shadow-md">
+          <Dna size={18} />
+          <span>新增繁育計畫</span>
+        </button>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {MOCK_STATS.map((stat, idx) => (
+          <Card key={idx} className="relative overflow-hidden group hover:shadow-md transition cursor-pointer">
+            <div className={`absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition`}>
+              <Cat size={64} className={stat.color.replace('bg-', 'text-')} />
+            </div>
+            <div className="relative z-10">
+              <p className="text-slate-500 text-sm font-medium">{stat.label}</p>
+              <h3 className="text-3xl font-bold text-slate-800 my-1">{stat.value}</h3>
+              <p className="text-xs text-slate-400">{stat.sub}</p>
+            </div>
+            <div className={`absolute bottom-0 left-0 w-full h-1 ${stat.color}`}></div>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Upcoming Tasks */}
+        <div className="lg:col-span-2 space-y-4">
+          <h3 className="text-lg font-bold text-slate-700 flex items-center gap-2">
+            <Bell size={20} className="text-indigo-500" /> 待辦事項提醒
+          </h3>
+          <Card className="divide-y divide-slate-100 p-0 overflow-hidden">
+             {[
+               { title: '幼貓 L-2023-A 第二劑疫苗', date: '今日', type: 'urgent' },
+               { title: 'Luna 產檢 (超音波)', date: '明天', type: 'normal' },
+               { title: '回訪家長：陳小姐 (小金適應狀況)', date: '2024-01-17', type: 'normal' },
+             ].map((task, i) => (
+               <div key={i} className="p-4 flex items-center justify-between hover:bg-slate-50 transition">
+                 <div className="flex items-center gap-3">
+                   <div className={`w-2 h-2 rounded-full ${task.type === 'urgent' ? 'bg-rose-500' : 'bg-blue-400'}`}></div>
+                   <span className="text-slate-700 font-medium">{task.title}</span>
+                 </div>
+                 <Badge type={task.type === 'urgent' ? 'danger' : 'default'}>{task.date}</Badge>
+               </div>
+             ))}
+          </Card>
+        </div>
+
+        {/* Quick Contract Access */}
+        <div className="space-y-4">
+           <h3 className="text-lg font-bold text-slate-700 flex items-center gap-2">
+            <FileText size={20} className="text-indigo-500" /> 最近合約
+          </h3>
+          <Card className="space-y-3">
+            <div className="p-3 border border-slate-100 rounded-lg flex items-center justify-between bg-slate-50">
+              <div className="flex items-center gap-3">
+                <div className="bg-white p-2 rounded shadow-sm">
+                  <FileText size={16} className="text-indigo-600"/>
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-slate-700">林先生 - 購貓合約</div>
+                  <div className="text-xs text-slate-500">已簽署 • 2024-01-05</div>
+                </div>
+              </div>
+              <CheckCircle size={16} className="text-green-500" />
+            </div>
+             <div className="p-3 border border-slate-100 rounded-lg flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-slate-100 p-2 rounded shadow-sm">
+                  <FileText size={16} className="text-slate-400"/>
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-slate-700">陳小姐 - 定型化契約</div>
+                  <div className="text-xs text-slate-500">草稿中 • 等待審核</div>
+                </div>
+              </div>
+              <span className="text-xs bg-slate-200 px-2 py-0.5 rounded text-slate-600">編輯</span>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+
+  const BreedingView = () => (
+    <div className="space-y-6 animate-fade-in">
+       <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+          <Dna className="text-purple-500" /> 繁育管理與血統
+        </h2>
+        <div className="flex gap-2">
+          <button className="px-3 py-1.5 text-sm bg-white border border-slate-300 rounded-lg hover:bg-slate-50">匯出 WCF 表格</button>
+          <button className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">新增種貓</button>
+        </div>
+      </div>
+
+      {/* Breeding Pairs / Litters */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="lg:col-span-2">
+           <h3 className="text-lg font-bold text-slate-700 mb-4">目前窩次狀態</h3>
+           <div className="overflow-x-auto">
+             <table className="w-full text-left text-sm">
+               <thead>
+                 <tr className="border-b border-slate-200 text-slate-500">
+                   <th className="pb-3 pl-2">窩次編號</th>
+                   <th className="pb-3">父系 / 母系</th>
+                   <th className="pb-3">日期</th>
+                   <th className="pb-3">數量</th>
+                   <th className="pb-3">狀態</th>
+                   <th className="pb-3 text-right">管理</th>
+                 </tr>
+               </thead>
+               <tbody className="divide-y divide-slate-100">
+                 {MOCK_LITTERS.map((litter) => (
+                   <tr key={litter.id} className="hover:bg-slate-50 group">
+                     <td className="py-3 pl-2 font-mono text-indigo-600">{litter.id}</td>
+                     <td className="py-3">
+                       <div className="flex items-center gap-2">
+                         <Badge type="info">{litter.sire}</Badge> 
+                         <span className="text-slate-300">+</span>
+                         <Badge type="purple">{litter.dam}</Badge>
+                       </div>
+                     </td>
+                     <td className="py-3 text-slate-600">{litter.date}</td>
+                     <td className="py-3 text-slate-600">{litter.count > 0 ? `${litter.count} 隻` : '-'}</td>
+                     <td className="py-3"><Badge type={litter.status === '預產期' ? 'warning' : 'success'}>{litter.status}</Badge></td>
+                     <td className="py-3 text-right">
+                       <button className="text-slate-400 hover:text-indigo-600"><Settings size={16} /></button>
+                     </td>
+                   </tr>
+                 ))}
+               </tbody>
+             </table>
+           </div>
+        </Card>
+
+        {/* Quick Lineage Look up */}
+        <Card className="bg-slate-50 border-dashed border-2 border-slate-200">
+          <h3 className="text-lg font-bold text-slate-700 mb-2">血統證書預覽</h3>
+          <p className="text-sm text-slate-500 mb-4">選擇種貓以查看五代血統表</p>
+          <div className="space-y-3">
+            {MOCK_BREEDING_CATS.map(cat => (
+              <div key={cat.id} className="bg-white p-3 rounded-lg border border-slate-200 flex items-center gap-3 cursor-pointer hover:border-indigo-400 transition">
+                <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-xl">
+                  {cat.image}
+                </div>
+                <div className="flex-1">
+                  <div className="flex justify-between">
+                    <span className="font-bold text-slate-700">{cat.name}</span>
+                    <span className={`text-xs px-1.5 rounded ${cat.gender === '公' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>{cat.gender}</span>
+                  </div>
+                  <div className="text-xs text-slate-400 font-mono mt-0.5">{cat.regNumber}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+
+  const HealthView = () => (
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+          <Syringe className="text-rose-500" /> 健康與疫苗管理
+        </h2>
+        <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-1.5">
+            <Search size={16} className="text-slate-400" />
+            <input type="text" placeholder="搜尋晶片號碼或名字..." className="outline-none text-sm w-48" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6">
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-slate-700">在舍幼貓健康追蹤</h3>
+            <div className="flex gap-2 text-sm">
+                <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-green-500"></div> 健康</span>
+                <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-amber-500"></div> 觀察中</span>
+            </div>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-slate-50">
+                <tr className="text-slate-500">
+                  <th className="p-3 rounded-l-lg">名字/花色</th>
+                  <th className="p-3">窩次</th>
+                  <th className="p-3">月齡</th>
+                  <th className="p-3">體重</th>
+                  <th className="p-3">疫苗進度</th>
+                  <th className="p-3">下一劑日期</th>
+                  <th className="p-3">狀態</th>
+                  <th className="p-3 rounded-r-lg text-right">操作</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {MOCK_HEALTH_RECORDS.map((cat) => (
+                  <tr key={cat.id} className="hover:bg-slate-50">
+                    <td className="p-3 font-medium text-slate-700">{cat.name}</td>
+                    <td className="p-3 text-slate-500">{cat.litter}</td>
+                    <td className="p-3 text-slate-600">{cat.age}</td>
+                    <td className="p-3 text-slate-600">{cat.weight}</td>
+                    <td className="p-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
+                          <div className={`h-full ${cat.vaccineStatus === '延遲' ? 'bg-amber-400' : 'bg-green-500'}`} style={{ width: '33%' }}></div>
+                        </div>
+                        <span className="text-xs text-slate-400">1/3</span>
+                      </div>
+                    </td>
+                    <td className="p-3 font-mono text-slate-600">
+                      {cat.nextVaccine}
+                      {cat.vaccineStatus === '延遲' && <AlertCircle size={14} className="inline ml-1 text-amber-500" />}
+                    </td>
+                    <td className="p-3">
+                      <Badge type={cat.status.includes('健康') ? 'success' : 'warning'}>{cat.status}</Badge>
+                    </td>
+                    <td className="p-3 text-right">
+                       <button className="text-indigo-600 hover:underline">紀錄</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+
+  const ContractsView = () => (
+    <div className="space-y-6 animate-fade-in">
+       <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+          <FileText className="text-blue-500" /> 定型化契約管理
+        </h2>
+        <button className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-900 flex items-center gap-2">
+          <Printer size={16} /> 預覽範本
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Template Selector */}
+        <div className="space-y-4">
+           <Card className="hover:border-indigo-500 transition cursor-pointer border-2 border-transparent">
+             <div className="flex items-start justify-between">
+                <div className="flex gap-4">
+                   <div className="p-3 bg-blue-100 rounded-lg text-blue-600">
+                     <FileText size={24} />
+                   </div>
+                   <div>
+                     <h3 className="font-bold text-slate-800">寵物貓讓渡合約 (絕育)</h3>
+                     <p className="text-sm text-slate-500 mt-1">標準版 v2.1 • 適用於一般家庭寵物</p>
+                     <div className="flex gap-2 mt-3">
+                       <Badge>含 FIP 保固</Badge>
+                       <Badge>含遺傳病條款</Badge>
+                     </div>
+                   </div>
+                </div>
+                <div className="h-5 w-5 rounded-full border border-slate-300 flex items-center justify-center">
+                   <div className="w-3 h-3 rounded-full bg-indigo-600"></div>
+                </div>
+             </div>
+           </Card>
+
+           <Card className="cursor-pointer border-2 border-transparent hover:border-slate-300">
+             <div className="flex items-start justify-between">
+                <div className="flex gap-4">
+                   <div className="p-3 bg-purple-100 rounded-lg text-purple-600">
+                     <Dna size={24} />
+                   </div>
+                   <div>
+                     <h3 className="font-bold text-slate-800">繁育權轉讓合約</h3>
+                     <p className="text-sm text-slate-500 mt-1">專業版 v1.0 • 適用於註冊貓舍</p>
+                   </div>
+                </div>
+                 <div className="h-5 w-5 rounded-full border border-slate-300"></div>
+             </div>
+           </Card>
+        </div>
+
+        {/* Contract Preview (Mock) */}
+        <div className="bg-slate-50 p-6 rounded-xl border border-slate-200 h-[600px] overflow-y-auto font-serif text-slate-700 shadow-inner relative">
+           <div className="absolute top-4 right-4 text-xs text-slate-400 font-sans">PREVIEW MODE</div>
+           
+           <h1 className="text-center text-xl font-bold mb-8 text-black">貓隻讓渡契約書</h1>
+           
+           <div className="space-y-6 text-sm leading-relaxed">
+             <p><strong>立契約書人：</strong></p>
+             <p>讓渡人（甲方）：<span className="border-b border-black px-2">Building 專業貓舍</span></p>
+             <p>承讓人（乙方）：<span className="bg-yellow-100 px-2">林先生</span></p>
+
+             <div className="border-t border-b border-slate-300 py-4 my-4">
+               <h4 className="font-bold mb-2">第一條：標的物（貓隻資料）</h4>
+               <ul className="list-disc pl-5 space-y-1">
+                 <li>品種：英國短毛貓</li>
+                 <li>性別：公</li>
+                 <li>花色：NY12</li>
+                 <li>出生日期：2023-10-15</li>
+               </ul>
+             </div>
+
+             <div className="bg-slate-100 p-4 rounded border border-slate-200">
+               <h4 className="font-bold mb-2 text-rose-700">第四條：健康擔保與責任 (保固條款)</h4>
+               <p className="mb-2">1. 甲方保證交付之貓隻於交付當日無臨床疾病徵兆。</p>
+               <p className="mb-2">2. <strong>遺傳性疾病保固：</strong> 若貓隻於交付後 <span className="font-bold underline">兩年內</span> 經合格獸醫師診斷確診患有 HCM (肥厚性心肌病) 或 PKD (多囊性腎病)，甲方無條件賠償一隻同等級幼貓。</p>
+               <p>3. <strong>傳染性腹膜炎 (FIP) 保固：</strong> 若於交付後 <span className="font-bold underline">180天內</span> 確診 FIP，甲方將協助提供治療藥物或更換貓隻 (詳見附件)。</p>
+             </div>
+
+             <p className="mt-8">本契約一式兩份，由甲乙雙方各執一份為憑。</p>
+             
+             <div className="flex justify-between mt-12">
+               <div>甲方簽章：<span className="font-cursive text-xl ml-2">Building Cattery</span></div>
+               <div>乙方簽章：_________________</div>
+             </div>
+           </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const CRMView = () => (
+    <div className="space-y-6 animate-fade-in">
+       <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+          <Users className="text-orange-500" /> 家長回訪追蹤系統
+        </h2>
+        <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">
+          登記新家長
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+         {/* Owner List */}
+         <div className="lg:col-span-2 space-y-4">
+            {MOCK_OWNERS.map(owner => (
+              <Card key={owner.id} className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                 <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold">
+                      {owner.name[0]}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-800">{owner.name} <span className="text-xs font-normal text-slate-400 ml-2">{owner.phone}</span></h3>
+                      <p className="text-sm text-slate-600 mt-1">擁有貓隻：<span className="font-medium text-indigo-600">{owner.cat}</span></p>
+                      <p className="text-xs text-slate-400 mt-1 bg-slate-100 inline-block px-2 py-0.5 rounded">備註：{owner.note}</p>
+                    </div>
+                 </div>
+                 
+                 <div className="flex flex-col items-end gap-2">
+                    <div className="text-sm text-slate-500">上次聯繫：{owner.lastContact}</div>
+                    <div className="flex items-center gap-2">
+                       <span className="text-xs font-bold text-rose-500 flex items-center gap-1">
+                          <Calendar size={12}/> 下次：{owner.nextContact}
+                       </span>
+                       <button className="px-3 py-1 bg-white border border-slate-300 text-slate-600 text-sm rounded hover:bg-slate-50">查看對話</button>
+                       <button className="px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700">完成回訪</button>
+                    </div>
+                 </div>
+              </Card>
+            ))}
+         </div>
+
+         {/* Follow Up Strategy Sidebar */}
+         <div className="space-y-4">
+            <Card className="bg-indigo-50 border-indigo-100">
+              <h3 className="font-bold text-indigo-800 mb-3 flex items-center gap-2">
+                <Heart size={18} /> 標準回訪流程
+              </h3>
+              <div className="relative border-l-2 border-indigo-200 ml-2 space-y-6 pl-6 py-2">
+                 <div className="relative">
+                   <div className="absolute -left-[31px] w-4 h-4 rounded-full bg-indigo-400 border-2 border-white"></div>
+                   <h4 className="font-bold text-sm text-indigo-700">第 1 天：抵達關懷</h4>
+                   <p className="text-xs text-indigo-600 mt-1">確認飲食、排泄、精神狀況。</p>
+                 </div>
+                 <div className="relative">
+                   <div className="absolute -left-[31px] w-4 h-4 rounded-full bg-indigo-400 border-2 border-white"></div>
+                   <h4 className="font-bold text-sm text-indigo-700">第 7 天：適應期結束</h4>
+                   <p className="text-xs text-indigo-600 mt-1">確認是否親人、是否需要更換飼料。</p>
+                 </div>
+                 <div className="relative">
+                   <div className="absolute -left-[31px] w-4 h-4 rounded-full bg-indigo-400 border-2 border-white"></div>
+                   <h4 className="font-bold text-sm text-indigo-700">第 6 個月：絕育提醒</h4>
+                   <p className="text-xs text-indigo-600 mt-1">安排絕育手術，索取絕育證明以發放證書。</p>
+                 </div>
+              </div>
+            </Card>
+         </div>
+      </div>
+    </div>
+  );
+
+  // --- Main Layout ---
+
+  const NavItem = ({ id, label, icon: Icon }) => (
+    <button
+      onClick={() => { setActiveTab(id); setIsMobileMenuOpen(false); }}
+      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium ${
+        activeTab === id 
+        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' 
+        : 'text-slate-500 hover:bg-slate-100'
+      }`}
+    >
+      <Icon size={20} />
+      <span>{label}</span>
+    </button>
+  );
+
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 flex">
+      {/* Sidebar (Desktop) */}
+      <aside className="hidden lg:flex flex-col w-72 bg-white border-r border-slate-200 h-screen sticky top-0 p-6">
+        <div className="flex items-center gap-3 mb-10 px-2">
+          <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
+            <Cat size={24} />
+          </div>
+          <div>
+            <h1 className="text-xl font-extrabold text-slate-800 tracking-tight">BUILDING</h1>
+            <p className="text-xs text-slate-400 uppercase tracking-widest">Cattery System</p>
+          </div>
+        </div>
+
+        <nav className="space-y-2 flex-1">
+          <NavItem id="dashboard" label="總覽儀表板" icon={Settings} />
+          <NavItem id="breeding" label="繁育與血統" icon={Dna} />
+          <NavItem id="health" label="健康管理" icon={Syringe} />
+          <NavItem id="contracts" label="合約與保固" icon={FileText} />
+          <NavItem id="crm" label="家長回訪" icon={Users} />
+        </nav>
+
+        <div className="mt-auto pt-6 border-t border-slate-100">
+           <div className="flex items-center gap-3 px-2">
+              <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">A</div>
+              <div className="flex-1">
+                <div className="text-sm font-bold">Admin User</div>
+                <div className="text-xs text-slate-400">主理人帳號</div>
+              </div>
+              <Settings size={16} className="text-slate-400 cursor-pointer hover:text-indigo-600"/>
+           </div>
+        </div>
+      </aside>
+
+      {/* Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 w-full bg-white z-50 border-b border-slate-200 px-4 py-3 flex justify-between items-center">
+         <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
+              <Cat size={18} />
+            </div>
+            <span className="font-bold text-slate-800">BUILDING</span>
+         </div>
+         <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+           {isMobileMenuOpen ? <X /> : <Menu />}
+         </button>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 bg-white z-40 pt-20 px-6 space-y-4">
+          <NavItem id="dashboard" label="總覽儀表板" icon={Settings} />
+          <NavItem id="breeding" label="繁育與血統" icon={Dna} />
+          <NavItem id="health" label="健康管理" icon={Syringe} />
+          <NavItem id="contracts" label="合約與保固" icon={FileText} />
+          <NavItem id="crm" label="家長回訪" icon={Users} />
+        </div>
+      )}
+
+      {/* Main Content Area */}
+      <main className="flex-1 p-4 lg:p-10 mt-16 lg:mt-0 overflow-y-auto">
+        <div className="max-w-6xl mx-auto">
+          {activeTab === 'dashboard' && <DashboardView />}
+          {activeTab === 'breeding' && <BreedingView />}
+          {activeTab === 'health' && <HealthView />}
+          {activeTab === 'contracts' && <ContractsView />}
+          {activeTab === 'crm' && <CRMView />}
+        </div>
+      </main>
+
+      <style>{`
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out forwards;
+        }
+        .font-cursive {
+          font-family: 'Brush Script MT', cursive;
+        }
+      `}</style>
+    </div>
+  );
+}
