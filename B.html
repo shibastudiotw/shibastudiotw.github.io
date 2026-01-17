@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <title>開發柴工作室 | AI 智慧科技與頂級網頁工藝</title>
+    
+    <link rel="icon" type="image/png" href="logo.png">
+    <meta name="theme-color" content="#020617">
+    <meta name="description" content="開發柴工作室 - 提供頂級客製化網站、AI 智慧自動化解決方案。拒絕平庸，為您的品牌打造數位資產。">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        shiba: {
+                            main: '#06b6d4',   // LOGO 科技青 (Cyan-500)
+                            glow: '#22d3ee',   // 亮部青色 (Cyan-400)
+                            gold: '#fbbf24',   // 奢華金 (Amber-400)
+                            dark: '#020617',   // 極深午夜藍 (Slate-950)
+                            card: '#0f172a',   // 卡片深藍 (Slate-900)
+                            surface: '#1e293b' // 表面懸浮色 (Slate-800)
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans TC', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Menlo', 'monospace'] // 增加科技感字體
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-glow': 'pulse-glow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'scan': 'scan 4s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        'pulse-glow': {
+                            '0%, 100%': { opacity: 1, boxShadow: '0 0 20px rgba(6, 182, 212, 0.2)' },
+                            '50%': { opacity: .8, boxShadow: '0 0 10px rgba(6, 182, 212, 0.05)' },
+                        },
+                        scan: {
+                            '0%': { backgroundPosition: '0% 50%' },
+                            '100%': { backgroundPosition: '100% 50%' },
+                        }
+                    },
+                    backgroundImage: {
+                        'tech-grid': "linear-gradient(to right, #1e293b 1px, transparent 1px), linear-gradient(to bottom, #1e293b 1px, transparent 1px)",
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js" defer></script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #020617; /* 深邃背景 */
+            color: #e2e8f0;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* 科技感網格背景 */
+        .bg-grid-pattern {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(30, 41, 59, 0.5) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(30, 41, 59, 0.5) 1px, transparent 1px);
+            mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+            -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+        }
+
+        /* 玻璃擬態導航 - 改為深藍冷色調 */
+        .glass-nav {
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(6, 182, 212, 0.1);
+        }
+
+        /* 輸入框 - 科技感邊框 */
+        .tech-input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            color: white;
+            transition: all 0.3s ease;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .tech-input:focus {
+            border-color: #06b6d4;
+            background: rgba(15, 23, 42, 0.9);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+            outline: none;
+        }
+
+        /* iOS 優化 */
+        input, textarea, select { font-size: 16px !important; }
+
+        /* 按鈕樣式 - 霓虹光暈 */
+        .neon-btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .neon-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg) translate(-100%, -100%);
+            transition: transform 0.6s;
+        }
+        .neon-btn:hover::after {
+            transform: rotate(45deg) translate(100%, 100%);
+        }
+        .neon-btn:active { transform: scale(0.98); }
+
+        /* 選項按鈕 */
+        .pill-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .pill-btn.active {
+            background: rgba(6, 182, 212, 0.15);
+            color: #22d3ee;
+            border-color: #06b6d4;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+        }
+        .pill-btn.inactive {
+            background: rgba(255, 255, 255, 0.02);
+            color: #94a3b8;
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+        .pill-btn.inactive:hover {
+            border-color: #06b6d4;
+            color: #22d3ee;
+        }
+
+        /* 簽名板 */
+        .fullscreen-signature {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100;
+            background: #020617; touch-action: none; display: flex; flex-direction: column;
+        }
+        .body-no-scroll { overflow: hidden; position: fixed; width: 100%; height: 100%; }
+
+        /* 滾動條 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
+
+        /* 動畫 */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        
+        /* 文字漸層特效 */
+        .text-gradient-tech {
+            background: linear-gradient(135deg, #fff 30%, #22d3ee 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .text-gradient-gold {
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- Mock Data ---
+        const MOCK_CLIENTS = {
+            "0912345678": {
+                name: "王小明",
+                company: "未來科技股份有限公司",
+                email: "demo@shiba.studio",
+                tax_id: "88888888",
+            }
+        };
+
+        const Icon = ({ name, size = 20, className = "" }) => {
+            const iconRef = useRef(null);
+            useEffect(() => {
+                if (window.lucide && iconRef.current) {
+                    window.lucide.createIcons({ root: iconRef.current, attrs: { class: className } });
+                }
+            }, [name, className]);
+            return <span ref={iconRef} className="inline-flex items-center justify-center"><i data-lucide={name} style={{ width: size, height: size }}></i></span>;
+        };
+
+        const Toast = ({ msg, type, onClose }) => {
+            useEffect(() => { const timer = setTimeout(onClose, 3000); return () => clearTimeout(timer); }, []);
+            const isErr = type === 'error';
+            return (
+                <div className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-none border-l-4 shadow-[0_0_30px_rgba(0,0,0,0.5)] flex items-center gap-3 backdrop-blur-xl animate-fade-in ${isErr ? 'bg-red-900/80 border-red-500 text-red-100' : 'bg-cyan-900/80 border-cyan-400 text-cyan-100'}`}>
+                    <Icon name={isErr?'alert-octagon':'check-circle-2'} size={18}/>
+                    <span className="font-mono text-sm tracking-wider">{msg}</span>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [scrolled, setScrolled] = useState(false);
+            const [mode, setMode] = useState('landing'); 
+            const [toast, setToast] = useState(null);
+            const [showSigPad, setShowSigPad] = useState(false);
+            const [signature, setSignature] = useState(null);
+            const [isSubmitting, setIsSubmitting] = useState(false);
+            const [showSuccess, setShowSuccess] = useState(false);
+            const [isSearching, setIsSearching] = useState(false);
+
+            const [formData, setFormData] = useState({
+                client_name: '', phone: '', email: '', company: '', tax_id: '',
+                project_name: '', budget: '', deadline: '',
+                services: [], features: [], notes: '', agree: false
+            });
+
+            useEffect(() => {
+                const body = document.body;
+                showSigPad ? body.classList.add('body-no-scroll') : body.classList.remove('body-no-scroll');
+                return () => body.classList.remove('body-no-scroll');
+            }, [showSigPad]);
+
+            useEffect(() => {
+                const handleScroll = () => setScrolled(window.scrollY > 50);
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            const showToast = (msg, type='success') => setToast({msg, type});
+
+            const handleSearch = () => {
+                const phone = formData.phone;
+                if(!phone || phone.length < 4) { showToast('請輸入完整電話號碼', 'error'); return; }
+                setIsSearching(true);
+                setTimeout(() => {
+                    setIsSearching(false);
+                    if(MOCK_CLIENTS[phone]) {
+                        const data = MOCK_CLIENTS[phone];
+                        setFormData(prev => ({ ...prev, client_name: data.name, company: data.company, email: data.email, tax_id: data.tax_id }));
+                        showToast(`系統已識別：${data.company}`);
+                    } else {
+                        showToast('資料庫無此紀錄', 'error');
+                    }
+                }, 800);
+            };
+
+            const toggleSelection = (field, value) => {
+                setFormData(prev => {
+                    const arr = prev[field];
+                    return { ...prev, [field]: arr.includes(value) ? arr.filter(i=>i!==value) : [...arr, value] };
+                });
+            };
+
+            const handleSubmit = () => {
+                if(!formData.client_name || !formData.phone) return showToast('基本資料欄位未完成', 'error');
+                if(!formData.project_name) return showToast('專案名稱未填寫', 'error');
+                if(!formData.agree) return showToast('請確認服務條款', 'error');
+                if(!signature) return showToast('數位簽章未完成', 'error');
+                setIsSubmitting(true);
+                setTimeout(() => { setIsSubmitting(false); setShowSuccess(true); }, 1500);
+            };
+
+            // --- Views ---
+
+            const LandingView = () => (
+                <div className="pt-20">
+                    {/* Hero Section */}
+                    <section className="relative min-h-[90vh] flex flex-col items-center justify-center text-center px-4 overflow-hidden">
+                        {/* 科技背景網格 */}
+                        <div className="absolute inset-0 bg-grid-pattern opacity-30"></div>
+                        
+                        {/* 氛圍光暈 */}
+                        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-shiba-main/10 rounded-full blur-[120px] pointer-events-none animate-pulse-glow"></div>
+                        <div className="absolute bottom-0 right-0 w-96 h-96 bg-shiba-gold/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+                        <div className="relative z-10 inline-flex items-center gap-3 px-4 py-2 rounded-full bg-shiba-main/5 border border-shiba-main/20 text-shiba-glow text-xs font-mono mb-8 animate-fade-in backdrop-blur-sm">
+                            <span className="relative flex h-2 w-2">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-shiba-main opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-shiba-glow"></span>
+                            </span>
+                            SYSTEM.READY // SHIBA_STUDIO_V2.0
+                        </div>
+                        
+                        <div className="relative z-10 max-w-5xl mx-auto">
+                            <h1 className="text-5xl md:text-8xl font-black mb-6 tracking-tighter leading-tight animate-fade-in">
+                                超越平庸的<br/>
+                                <span className="text-gradient-tech">數位工藝體驗</span>
+                            </h1>
+                            <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-in delay-100 font-light">
+                                不只是網頁設計，而是為您的品牌注入 <span className="text-shiba-glow font-bold">AI 智能</span> 與 <span className="text-shiba-gold font-bold">頂級美學</span>。
+                                <br/>開發柴工作室，專為追求卓越的您而生。
+                            </p>
+                            
+                            <div className="flex flex-col md:flex-row gap-5 w-full max-w-md mx-auto animate-fade-in delay-200">
+                                <button onClick={() => setMode('form')} className="neon-btn flex-1 py-4 bg-shiba-main hover:bg-cyan-400 text-shiba-dark rounded-none skew-x-[-10deg] font-bold text-lg shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all flex items-center justify-center gap-2 group">
+                                    <div className="skew-x-[10deg] flex items-center gap-2">
+                                        <Icon name="zap" size={20} className="fill-current"/> 啟動專案諮詢
+                                    </div>
+                                </button>
+                                <button className="flex-1 py-4 bg-transparent hover:bg-white/5 text-white border border-white/10 hover:border-shiba-main/50 rounded-none skew-x-[-10deg] font-bold text-lg transition-all flex items-center justify-center gap-2 group">
+                                     <div className="skew-x-[10deg] flex items-center gap-2 text-slate-300 group-hover:text-shiba-glow">
+                                        <Icon name="cpu" size={20}/> 探索核心技術
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {/* 滾動提示 */}
+                        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50">
+                            <span className="text-[10px] font-mono tracking-[0.2em] text-shiba-main">SCROLL_DOWN</span>
+                            <div className="w-[1px] h-12 bg-gradient-to-b from-shiba-main to-transparent"></div>
+                        </div>
+                    </section>
+
+                    {/* Services Section */}
+                    <section className="py-32 px-4 max-w-7xl mx-auto relative z-10" id="services">
+                        <div className="flex flex-col md:flex-row justify-between items-end mb-16 border-b border-white/5 pb-8">
+                            <div>
+                                <h2 className="text-3xl md:text-5xl font-black mb-2 text-white">CORE SERVICES</h2>
+                                <p className="text-shiba-main font-mono text-sm tracking-widest">/// 核心服務模組</p>
+                            </div>
+                            <div className="text-slate-500 text-sm md:text-right mt-4 md:mt-0 max-w-xs">
+                                結合最新 Web 技術堆疊，提供高執行效率的解決方案。
+                            </div>
+                        </div>
+                        
+                        <div className="grid md:grid-cols-3 gap-6">
+                            {[
+                                {
+                                    icon:'file-code', 
+                                    title:'智能契約系統', 
+                                    desc:'E-Contract System',
+                                    detail: '無紙化簽署流程，整合區塊鏈概念存證，確保資料不可竄改且隨時調閱。',
+                                    color: 'text-shiba-glow',
+                                    border: 'group-hover:border-shiba-main/50'
+                                },
+                                {
+                                    icon:'layout-dashboard', 
+                                    title:'旗艦級形象官網', 
+                                    desc:'Premium Web Design',
+                                    detail: '拒絕罐頭模板。使用 React/Next.js 打造的高效能動態網站，極致流暢的使用者體驗。',
+                                    color: 'text-purple-400',
+                                    border: 'group-hover:border-purple-500/50'
+                                },
+                                {
+                                    icon:'bot', 
+                                    title:'AI 自動化部屬', 
+                                    desc:'AI Automation',
+                                    detail: '串接 ChatGPT/Claude API，自動化處理客服回覆、資料分析與排程管理。',
+                                    color: 'text-shiba-gold',
+                                    border: 'group-hover:border-shiba-gold/50'
+                                }
+                            ].map((s,i) => (
+                                <div key={i} className={`p-8 bg-shiba-card/50 backdrop-blur-sm border border-white/5 ${s.border} transition-all duration-500 group relative overflow-hidden hover:bg-shiba-card`}>
+                                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                        <Icon name={s.icon} size={100} className="stroke-1"/>
+                                    </div>
+                                    <div className={`w-12 h-12 rounded-none border border-white/10 flex items-center justify-center ${s.color} mb-6 bg-white/5`}>
+                                        <Icon name={s.icon} size={24}/>
+                                    </div>
+                                    <h3 className="text-2xl font-bold mb-1 text-white">{s.title}</h3>
+                                    <p className="text-xs font-mono text-slate-500 mb-4 tracking-wider">{s.desc}</p>
+                                    <p className="text-slate-400 text-sm leading-relaxed border-t border-white/5 pt-4">{s.detail}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* Advantage Section (Buyout Model) */}
+                    <section className="py-24 px-4 bg-[#050a14] border-y border-white/5">
+                        <div className="max-w-6xl mx-auto">
+                            <div className="grid md:grid-cols-2 gap-16 items-center">
+                                <div>
+                                    <div className="inline-block px-3 py-1 border border-shiba-gold/30 text-shiba-gold text-xs font-bold tracking-widest mb-6 rounded-full bg-shiba-gold/5">
+                                        VIP 尊榮方案
+                                    </div>
+                                    <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight">
+                                        一次性買斷<br/>
+                                        <span className="text-slate-500">終身擁有數位資產</span>
+                                    </h2>
+                                    <p className="text-slate-400 mb-8 text-lg font-light">
+                                        不同於市面上的訂閱制軟體，我們相信您應該完全擁有您的系統。
+                                        就像購買頂級腕錶一樣，這是一次性的投資，而非無止盡的開銷。
+                                    </p>
+                                    
+                                    <div className="space-y-6">
+                                        {[
+                                            {title: "Source Code Ownership", sub: "完整原始碼交付，掌握核心資產"},
+                                            {title: "Zero Monthly Fees", sub: "無隱藏月費，大幅降低長期營運成本"},
+                                            {title: "1-Year Premium Support", sub: "包含一年技術保固與伺服器維護"}
+                                        ].map((item, i) => (
+                                            <div key={i} className="flex gap-4">
+                                                <div className="w-1 h-full bg-gradient-to-b from-shiba-gold to-transparent min-h-[50px]"></div>
+                                                <div>
+                                                    <h4 className="font-bold text-white text-lg font-mono">{item.title}</h4>
+                                                    <p className="text-slate-500 text-sm">{item.sub}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                
+                                <div className="relative">
+                                    <div className="absolute -inset-1 bg-gradient-to-r from-shiba-gold to-shiba-main opacity-20 blur-lg rounded-2xl"></div>
+                                    <div className="relative bg-shiba-card border border-white/10 rounded-2xl p-8 backdrop-blur-xl">
+                                        <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+                                            <span className="font-mono text-slate-400">COST_COMPARISON</span>
+                                            <Icon name="bar-chart-3" className="text-shiba-gold"/>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between p-4 bg-white/5 rounded">
+                                                <span className="text-sm text-slate-300">市面訂閱制軟體 (3年)</span>
+                                                <span className="font-mono text-red-400">$ 108,000+</span>
+                                            </div>
+                                            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-shiba-gold/20 to-transparent border border-shiba-gold/20 rounded">
+                                                <span className="text-sm text-shiba-gold font-bold">開發柴買斷制</span>
+                                                <span className="font-mono text-shiba-gold font-bold text-xl">$ One Time</span>
+                                            </div>
+                                            <p className="text-center text-xs text-slate-600 mt-4">
+                                                * 以每月 $3,000 租用費計算，三年即省下鉅額成本
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* CTA Section */}
+                    <section className="py-32 px-4 text-center relative overflow-hidden">
+                        <div className="absolute inset-0 bg-shiba-main/5 skew-y-3 transform origin-bottom-right"></div>
+                        <div className="max-w-4xl mx-auto relative z-10">
+                            <h2 className="text-5xl md:text-7xl font-black mb-8 tracking-tighter text-white">
+                                START YOUR PROJECT
+                            </h2>
+                            <p className="text-slate-400 mb-12 text-xl font-light">
+                                準備好讓您的事業升級了嗎？<br/>
+                                填寫下方的高級委託單，我們將為您配置專屬解決方案。
+                            </p>
+                            <button onClick={() => setMode('form')} className="neon-btn px-12 py-6 bg-white text-black font-black text-xl hover:bg-shiba-main hover:text-white transition-colors shadow-2xl">
+                                立即啟動諮詢 <Icon name="arrow-right" className="inline ml-2"/>
+                            </button>
+                        </div>
+                    </section>
+                </div>
+            );
+
+            const FormView = () => (
+                <div className="pt-32 pb-20 px-4 max-w-4xl mx-auto animate-fade-in relative">
+                    <div className="absolute top-0 left-0 w-full h-full bg-grid-pattern opacity-10 pointer-events-none z-[-1]"></div>
+                    
+                    <div className="flex items-center justify-between mb-12">
+                        <button onClick={() => setMode('landing')} className="text-slate-500 hover:text-shiba-main text-sm font-mono flex items-center gap-2 transition-colors">
+                            <Icon name="chevron-left" size={16}/> BACK_TO_HOME
+                        </button>
+                        <div className="text-right">
+                            <h2 className="text-3xl font-black text-white">專案委託單</h2>
+                            <p className="text-shiba-main font-mono text-xs tracking-widest">PROJECT_REQUEST_FORM</p>
+                        </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-12 gap-8">
+                        {/* 左側表單 */}
+                        <div className="md:col-span-8 space-y-8">
+                            {/* 1. 客戶資料 */}
+                            <div className="bg-shiba-card/80 backdrop-blur border border-white/5 p-8 relative overflow-hidden group">
+                                <div className="absolute top-0 left-0 w-1 h-full bg-shiba-main"></div>
+                                <div className="flex items-center gap-3 mb-8">
+                                    <Icon name="user-circle" className="text-shiba-main"/>
+                                    <h3 className="text-lg font-bold tracking-wider">CLIENT INFO // 基本資料</h3>
+                                </div>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-mono text-slate-500">PHONE NUMBER *</label>
+                                        <div className="flex gap-2">
+                                            <input value={formData.phone} onChange={e=>setFormData({...formData, phone:e.target.value})} className="tech-input w-full px-4 py-3 text-sm font-mono" placeholder="09xxxxxxxx"/>
+                                            <button onClick={handleSearch} disabled={isSearching} className="px-4 border border-white/10 hover:border-shiba-main text-shiba-main hover:bg-shiba-main/10 transition-colors flex items-center justify-center">
+                                                {isSearching ? <Icon name="loader-2" className="animate-spin"/> : <Icon name="search" size={18}/>}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-mono text-slate-500">CONTACT NAME *</label>
+                                        <input value={formData.client_name} onChange={e=>setFormData({...formData, client_name:e.target.value})} className="tech-input w-full px-4 py-3 text-sm" placeholder="您的稱呼"/>
+                                    </div>
+                                    <div className="space-y-2 md:col-span-2">
+                                        <label className="text-xs font-mono text-slate-500">COMPANY / TAX ID</label>
+                                        <div className="flex gap-2">
+                                            <input value={formData.company} onChange={e=>setFormData({...formData, company:e.target.value})} className="tech-input flex-[2] px-4 py-3 text-sm" placeholder="公司抬頭"/>
+                                            <input value={formData.tax_id} onChange={e=>setFormData({...formData, tax_id:e.target.value})} className="tech-input flex-1 px-4 py-3 text-sm font-mono" placeholder="統編"/>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2 md:col-span-2">
+                                        <label className="text-xs font-mono text-slate-500">EMAIL ADDRESS *</label>
+                                        <input value={formData.email} onChange={e=>setFormData({...formData, email:e.target.value})} className="tech-input w-full px-4 py-3 text-sm font-mono" placeholder="name@company.com"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 2. 專案需求 */}
+                            <div className="bg-shiba-card/80 backdrop-blur border border-white/5 p-8 relative overflow-hidden">
+                                <div className="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
+                                <div className="flex items-center gap-3 mb-8">
+                                    <Icon name="cpu" className="text-purple-500"/>
+                                    <h3 className="text-lg font-bold tracking-wider">SPECS // 需求規格</h3>
+                                </div>
+                                
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-mono text-slate-500">PROJECT NAME *</label>
+                                        <input value={formData.project_name} onChange={e=>setFormData({...formData, project_name:e.target.value})} className="tech-input w-full px-4 py-3 font-bold" placeholder="例：2026 旗艦官網改版計畫"/>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <label className="text-xs font-mono text-slate-500">MODULES (MULTI-SELECT)</label>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {['電子契約系統', '形象官網設計', 'AI 客服機器人', 'SEO 搜尋優化', '金流支付串接', 'CMS 後台管理'].map(opt => (
+                                                <button key={opt} onClick={()=>toggleSelection('services', opt)} 
+                                                    className={`pill-btn px-4 py-3 text-sm font-bold text-left flex justify-between items-center border ${formData.services.includes(opt) ? 'active' : 'inactive'}`}>
+                                                    {opt}
+                                                    {formData.services.includes(opt) && <Icon name="check" size={14}/>}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-mono text-slate-500">BUDGET RANGE</label>
+                                            <select className="tech-input w-full px-4 py-3 appearance-none" value={formData.budget} onChange={e=>setFormData({...formData, budget:e.target.value})}>
+                                                <option value="">選擇預算區間...</option>
+                                                <option value="5-10萬">5萬 - 10萬 (標準版)</option>
+                                                <option value="10-30萬">10萬 - 30萬 (專業版)</option>
+                                                <option value="30萬+">30萬以上 (旗艦版)</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-mono text-slate-500">DEADLINE</label>
+                                            <input type="date" className="tech-input w-full px-4 py-3" value={formData.deadline} onChange={e=>setFormData({...formData, deadline:e.target.value})}/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-mono text-slate-500">ADDITIONAL NOTES</label>
+                                        <textarea className="tech-input w-full px-4 py-3 h-32" placeholder="請描述您的構想或參考網站..." value={formData.notes} onChange={e=>setFormData({...formData, notes:e.target.value})}></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 右側：條款與提交 */}
+                        <div className="md:col-span-4 space-y-8">
+                             <div className="bg-shiba-card/80 backdrop-blur border border-shiba-gold/30 p-6 relative">
+                                <div className="flex items-center gap-2 mb-4 text-shiba-gold">
+                                    <Icon name="shield-check" size={20}/>
+                                    <h4 className="font-bold">服務條款摘要</h4>
+                                </div>
+                                <ul className="text-xs text-slate-400 list-disc pl-4 space-y-2 mb-6 leading-relaxed">
+                                    <li>專案採<span className="text-white font-bold">買斷制</span>，無後續月費。</li>
+                                    <li>提供一年免費系統維護保固。</li>
+                                    <li>確認報價後需支付 40% 訂金啟動專案。</li>
+                                </ul>
+
+                                <label className="flex items-start gap-3 cursor-pointer mb-6 group p-3 hover:bg-white/5 rounded transition-colors">
+                                    <div className={`mt-0.5 w-5 h-5 border flex items-center justify-center transition-colors ${formData.agree ? 'bg-shiba-gold border-shiba-gold text-black' : 'border-slate-600 group-hover:border-shiba-gold'}`}>
+                                        {formData.agree && <Icon name="check" size={14} strokeWidth={4}/>}
+                                    </div>
+                                    <input type="checkbox" className="hidden" checked={formData.agree} onChange={e=>setFormData({...formData, agree:e.target.checked})}/>
+                                    <span className="text-xs font-bold text-slate-300 group-hover:text-white transition-colors">我已詳閱並同意服務條款</span>
+                                </label>
+
+                                <div className="border-t border-white/10 pt-6">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <label className="text-xs font-mono text-slate-500">DIGITAL SIGNATURE</label>
+                                        {signature && <button onClick={()=>setSignature(null)} className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1">清除重簽</button>}
+                                    </div>
+                                    
+                                    {signature ? (
+                                        <div className="w-full h-24 bg-white/90 rounded flex items-center justify-center">
+                                            <img src={signature} className="h-full object-contain"/>
+                                        </div>
+                                    ) : (
+                                        <button onClick={()=>setShowSigPad(true)} className="w-full h-24 border border-dashed border-slate-600 hover:border-shiba-main hover:bg-shiba-main/5 text-slate-500 hover:text-shiba-main transition-all flex flex-col items-center justify-center gap-2 rounded">
+                                            <Icon name="pen-tool" size={20}/>
+                                            <span className="text-xs">點擊簽署</span>
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            <button onClick={handleSubmit} disabled={isSubmitting} className="w-full py-6 bg-gradient-to-r from-shiba-main to-cyan-600 hover:brightness-110 text-white font-black text-xl shadow-[0_0_30px_rgba(6,182,212,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3">
+                                {isSubmitting ? <Icon name="loader-2" className="animate-spin"/> : <Icon name="send" className="animate-pulse"/>}
+                                {isSubmitting ? 'PROCESSING...' : 'SUBMIT REQUEST'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // --- Fullscreen Signature Pad (不變，僅改背景色) ---
+            const SignatureModal = () => {
+                const canvasRef = useRef(null);
+                const padRef = useRef(null);
+                useEffect(() => {
+                    const canvas = canvasRef.current;
+                    const resizeCanvas = () => {
+                        const parent = canvas.parentElement; if (!parent) return;
+                        const rect = parent.getBoundingClientRect(); const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                        canvas.width = rect.width * ratio; canvas.height = rect.height * ratio;
+                        canvas.style.width = `${rect.width}px`; canvas.style.height = `${rect.height}px`;
+                        const ctx = canvas.getContext("2d"); ctx.scale(ratio, ratio);
+                        if (padRef.current) { padRef.current.clear(); } else { padRef.current = new SignaturePad(canvas, { penColor: '#22d3ee', minWidth: 2 }); }
+                    };
+                    resizeCanvas(); window.addEventListener('resize', resizeCanvas); return () => window.removeEventListener('resize', resizeCanvas);
+                }, []);
+                
+                return (
+                    <div className="fullscreen-signature p-4">
+                        <div className="flex justify-between items-center mb-4 text-slate-300">
+                            <span className="text-sm font-mono">請在此區域簽名</span>
+                            <div className="flex gap-4">
+                                <button onClick={()=>padRef.current.clear()} className="text-sm px-4 py-2 border border-white/20 rounded hover:bg-white/10">清除</button>
+                                <button onClick={()=>{if(!padRef.current.isEmpty()){setSignature(padRef.current.toDataURL());setShowSigPad(false);}else{showToast('請先簽名','error')}}} className="text-sm px-6 py-2 bg-shiba-main text-black font-bold rounded hover:bg-cyan-400">確認簽名</button>
+                                <button onClick={()=>setShowSigPad(false)} className="text-sm text-slate-500 hover:text-white">取消</button>
+                            </div>
+                        </div>
+                        <div className="flex-1 border border-white/10 rounded-xl bg-[#0f172a] overflow-hidden relative">
+                             <canvas ref={canvasRef} className="absolute top-0 left-0 touch-none"></canvas>
+                        </div>
+                    </div>
+                );
+            };
+
+            // --- Success Modal ---
+            const SuccessModal = () => (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-fade-in">
+                    <div className="w-full max-w-md bg-shiba-card border border-shiba-main/30 p-1 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-shiba-main to-shiba-glow animate-pulse"></div>
+                        <div className="bg-[#020617] p-8 text-center">
+                            <div className="w-20 h-20 bg-shiba-main/10 rounded-full flex items-center justify-center text-shiba-glow mx-auto mb-6 border border-shiba-main/20 shadow-[0_0_30px_rgba(6,182,212,0.2)]">
+                                <Icon name="check" size={40}/>
+                            </div>
+                            <h2 className="text-2xl font-black text-white mb-2">REQUEST RECEIVED</h2>
+                            <p className="text-slate-400 text-sm mb-8">系統已接收您的委託，專案經理將於 24H 內與您聯繫。</p>
+                            
+                            <div className="space-y-4 mb-8 text-left">
+                                <div className="flex justify-between border-b border-white/10 pb-2">
+                                    <span className="text-xs text-slate-500 font-mono">PROJECT</span>
+                                    <span className="text-sm text-white font-bold">{formData.project_name}</span>
+                                </div>
+                                <div className="flex justify-between border-b border-white/10 pb-2">
+                                    <span className="text-xs text-slate-500 font-mono">CLIENT</span>
+                                    <span className="text-sm text-white font-bold">{formData.client_name}</span>
+                                </div>
+                            </div>
+
+                            <button onClick={()=>window.location.reload()} className="w-full py-4 bg-white text-black font-bold hover:bg-shiba-main hover:text-white transition-colors">
+                                RETURN TO HOMEPAGE
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="min-h-screen relative selection:bg-shiba-main selection:text-black">
+                    {toast && <Toast msg={toast.msg} type={toast.type} onClose={()=>setToast(null)}/>}
+                    {showSigPad && <SignatureModal/>}
+                    {showSuccess && <SuccessModal/>}
+                    
+                    {/* Navigation */}
+                    <nav className={`fixed top-0 w-full z-40 transition-all duration-300 ${scrolled ? 'glass-nav py-3' : 'bg-transparent py-6'}`}>
+                        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+                            <div className="flex items-center gap-3 cursor-pointer group" onClick={()=>setMode('landing')}>
+                                <img src="logo.png" className="w-10 h-10 object-contain drop-shadow-[0_0_10px_rgba(6,182,212,0.5)]"/>
+                                <span className="font-black text-xl tracking-tighter text-white hidden md:block">SHIBA<span className="text-shiba-main">.STUDIO</span></span>
+                            </div>
+                            <div className="hidden md:flex items-center gap-8 text-xs font-mono font-bold text-slate-400 tracking-widest">
+                                <a href="#" onClick={()=>setMode('landing')} className="hover:text-shiba-glow transition-colors">HOME</a>
+                                <a href="#services" className="hover:text-shiba-glow transition-colors">SERVICES</a>
+                                <span className="text-shiba-gold">PREMIUM_ONLY</span>
+                            </div>
+                            <button onClick={()=>setMode('form')} className="px-6 py-2 border border-shiba-main/50 text-shiba-main hover:bg-shiba-main hover:text-black font-bold text-xs transition-all flex items-center gap-2">
+                                CONTACT_US
+                            </button>
+                        </div>
+                    </nav>
+
+                    {mode === 'landing' ? <LandingView/> : <FormView/>}
+
+                    {/* Footer */}
+                    <footer className="bg-[#020617] py-12 border-t border-white/5 relative z-10">
+                        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+                            <div className="flex items-center gap-2">
+                                <span className="font-mono text-xs text-slate-600">© 2026 SHIBA STUDIO. ALL RIGHTS RESERVED.</span>
+                            </div>
+                            <div className="flex gap-6 text-slate-600 text-xs font-mono">
+                                <a href="#" className="hover:text-shiba-main transition-colors">PRIVACY</a>
+                                <a href="#" className="hover:text-shiba-main transition-colors">TERMS</a>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
