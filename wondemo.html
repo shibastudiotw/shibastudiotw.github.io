@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+
+    <title>開發柴工作室 | 寵物預約系統範本</title>
+    
+    <link rel="manifest" href="manifest.json?v=3">
+    <meta name="theme-color" content="#736357">
+    
+    <link rel="icon" type="image/png" href="logo.png"> 
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">    
+
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/react-datepicker@4.25.0/dist/react-datepicker.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tailwind config with dark mode
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            yellow: '#F7E7B5',
+                            brown: '#736357',
+                            'dark-brown': '#5D4D41',
+                            light: '#fbf9f6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js" defer></script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-datepicker@4.25.0/dist/react-datepicker.min.js" defer></script>
+
+    <style>
+        :root { 
+            --brand-yellow: #F7E7B5; 
+            --brand-brown: #736357; 
+            --brand-dark-brown: #5D4D41;
+            --brand-light: #fbf9f6; 
+            --line-green: #06C755; 
+            --error-red: #ef4444;
+            --info-blue: #3b82f6;
+        }
+
+        html, body { 
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Plus Jakarta Sans', 'Noto Sans TC', sans-serif; 
+            background-color: var(--brand-light);
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+            color: var(--brand-brown); 
+            -webkit-font-smoothing: antialiased; 
+            -webkit-tap-highlight-color: transparent; 
+            overflow-x: hidden;
+            overscroll-behavior-y: contain;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Dark mode styles */
+        body.dark { background-color: #1f2937; color: #f3f4f6; }
+        .dark .glass-card { background: rgba(55, 65, 81, 0.95); border-color: rgba(75, 85, 99, 0.6); }
+        .dark .cute-input { background: #374151; border-color: #4b5563; color: #f3f4f6; }
+        .dark .cute-input:focus { background: #4b5563; border-color: var(--brand-yellow); }
+        .dark .cute-input::placeholder { color: #6b7280; }
+        .dark .text-slate-400 { color: #9ca3af; }
+        .dark .text-slate-500 { color: #6b7280; }
+        .dark .border-slate-100 { border-color: #4b5563; }
+        .dark .bg-white { background-color: #374151; }
+        .dark .bg-slate-50 { background-color: #1f2937; }
+
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6); 
+            border-bottom: 0;
+            box-shadow: 0 4px 6px -1px rgba(115, 99, 87, 0.05), 0 10px 15px -3px rgba(115, 99, 87, 0.05), inset 0 0 0 1px rgba(255,255,255,0.5); 
+            border-radius: 2rem; 
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+        }
+        .section-highlight { border-bottom: 3px solid var(--brand-yellow); }
+        .cute-input { 
+            background: #ffffff; 
+            border: 3px solid #eeebe6; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--brand-dark-brown);
+            box-shadow: 0 2px 8px rgba(115, 99, 87, 0.06), inset 0 1px 3px rgba(255, 255, 255, 0.9);
+        }
+        .cute-input:focus { 
+            background: #ffffff; 
+            border-color: var(--brand-brown); 
+            box-shadow: 0 0 0 5px rgba(115, 99, 87, 0.15), 0 6px 16px rgba(115, 99, 87, 0.12); 
+            outline: none; 
+            transform: translateY(-2px);
+        }
+        .cute-input.input-error {
+            border-color: var(--error-red) !important;
+            background-color: #fef2f2 !important;
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15), 0 4px 12px rgba(239, 68, 68, 0.2) !important;
+        }
+        .dark .cute-input.input-error { background-color: rgba(239, 68, 68, 0.1) !important; }
+        .cute-input::placeholder { color: #d1ccc5; }
+
+        .canvas-container { 
+            position: relative; border-radius: 1.5rem; overflow: hidden; background: #fff; 
+            touch-action: none; user-select: none; -webkit-user-select: none; 
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .canvas-container canvas { width: 100%; height: 100%; touch-action: none; display: block; }
+
+        body.signing-mode {
+            position: fixed !important; width: 100vw !important; height: 100vh !important;
+            top: 0 !important; left: 0 !important; overflow: hidden !important; touch-action: none !important;
+        }
+        .fullscreen-signature { position: fixed; inset: 0; z-index: 100; touch-action: none; overscroll-behavior: none; }
+
+        @keyframes pulse-soft { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+        .line-btn-animated { background-color: var(--line-green); animation: pulse-soft 2.5s infinite ease-in-out; }
+        .fade-enter { opacity: 0; transform: translateY(10px); }
+        .fade-enter-active { opacity: 1; transform: translateY(0); transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+        .shake-error { animation: shake 0.4s ease-in-out; }
+        .group-error { padding: 8px; margin: -4px; border-radius: 1.2rem; border: 2px dashed var(--error-red); background-color: #fff8f8; animation: shake 0.4s ease-in-out; }
+        .dark .group-error { background-color: rgba(239, 68, 68, 0.1); }
+
+        .pill-button { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .pill-button:active { transform: scale(0.96); }
+
+        @keyframes slide-down { from { transform: translate(-50%, -100%); opacity: 0; } to { transform: translate(-50%, 24px); opacity: 1; } }
+        .toast-enter { animation: slide-down 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .field-error { color: var(--error-red); font-size: 11px; font-weight: 700; margin-top: 4px; display: flex; align-items: center; gap: 4px; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: skeleton-loading 1.5s infinite; border-radius: 0.5rem; }
+        .dark .skeleton { background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%); background-size: 200% 100%; }
+        @keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* Date picker */
+        .react-datepicker-wrapper { width: 100%; }
+        .react-datepicker__input-container input { width: 100%; }
+        .react-datepicker { font-family: 'Plus Jakarta Sans', 'Noto Sans TC', sans-serif !important; border: 2px solid var(--brand-brown) !important; border-radius: 1rem !important; box-shadow: 0 10px 25px -5px rgba(115, 99, 87, 0.2) !important; }
+        .react-datepicker__header { background: var(--brand-yellow) !important; border-bottom: none !important; border-radius: 0.8rem 0.8rem 0 0 !important; }
+        .react-datepicker__current-month, .react-datepicker__day-name { color: var(--brand-brown) !important; font-weight: 700 !important; }
+        .react-datepicker__day--selected { background: var(--brand-brown) !important; border-radius: 50% !important; }
+        .react-datepicker__day:hover { background: var(--brand-yellow) !important; border-radius: 50% !important; }
+
+        .stay-duration-badge { background: linear-gradient(135deg, var(--brand-yellow), #ffd700); color: var(--brand-brown); padding: 8px 16px; border-radius: 9999px; font-weight: 800; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(247, 231, 181, 0.4); animation: pulse-soft 2s infinite; }
+        .dark-mode-toggle { position: fixed; bottom: 20px; right: 20px; z-index: 50; width: 50px; height: 50px; border-radius: 50%; background: var(--brand-brown); color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(115, 99, 87, 0.3); cursor: pointer; transition: all 0.3s; }
+        .dark-mode-toggle:hover { transform: scale(1.1); }
+        .dark .dark-mode-toggle { background: var(--brand-yellow); color: var(--brand-brown); }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    
+<script type="text/babel">
+const { useState, useEffect, useRef, useMemo, useCallback } = React;
+
+        // --- Terms Modal Component ---
+        const TermsModal = ({ isOpen, onClose, title, children, onAgree }) => {
+            const contentRef = useRef(null);
+            const [canAgree, setCanAgree] = useState(false);
+            useEffect(() => {
+                if (isOpen) {
+                    setCanAgree(false);
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+                return () => { document.body.style.overflow = ''; };
+            }, [isOpen]);
+
+            const handleScroll = (e) => {
+                const { scrollTop, scrollHeight, clientHeight } = e.target;
+                if (scrollHeight - scrollTop - clientHeight < 50) setCanAgree(true);
+            };
+
+            useEffect(() => {
+                if (isOpen) {
+                    setCanAgree(false);
+                    const timer = setTimeout(() => {
+                        if (contentRef.current) {
+                            if (contentRef.current.scrollHeight <= contentRef.current.clientHeight + 1) setCanAgree(true);
+                        }
+                    }, 500);
+                    return () => clearTimeout(timer);
+                }
+            }, [isOpen]);
+
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 z-[150] bg-white dark:bg-gray-900 flex flex-col animate-in slide-in-from-bottom-full duration-300">
+                    <div className="px-5 py-4 border-b border-slate-100 dark:border-gray-800 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm flex justify-between items-center shrink-0">
+                        <h3 className="text-lg font-black text-[#736357] dark:text-[#F7E7B5]">{title}</h3>
+                        <button type="button" onClick={onClose} className="p-2 bg-slate-100 dark:bg-gray-800 rounded-full hover:bg-slate-200 dark:hover:bg-gray-700 transition-colors">
+                            <Icon name="x" size={20} className="text-slate-500 dark:text-gray-400" />
+                        </button>
+                    </div>
+                    <div ref={contentRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-6 text-sm leading-relaxed text-[#736357] dark:text-gray-300 space-y-4">
+                        {children}
+                        <div className="h-10"></div>
+                    </div>
+                    <div className="p-5 border-t border-slate-100 dark:border-gray-800 bg-white dark:bg-gray-900 shrink-0 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
+                        {!canAgree && <div className="text-center text-xs font-bold text-red-400 mb-3 animate-pulse">👇 請滑動至最底部以同意條款</div>}
+                        <button onClick={() => { if(canAgree) { if (onAgree) onAgree(); onClose(); }}} type="button" disabled={!canAgree}
+                            className={`w-full py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all ${canAgree ? 'bg-[#736357] text-white shadow-lg shadow-[#736357]/30 hover:bg-[#5D4D41]' : 'bg-slate-200 dark:bg-gray-700 text-slate-400 dark:text-gray-500 cursor-not-allowed'}`}>
+                            <Icon name="check-circle" size={20} /> 本人已詳閱並同意以上契約內容
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Dark Mode Hook ---
+        const useDarkMode = () => {
+            const [isDark, setIsDark] = useState(() => {
+                const saved = localStorage.getItem('darkMode');
+                if (saved !== null) return JSON.parse(saved);
+                return window.matchMedia('(prefers-color-scheme: dark)').matches;
+            });
+            useEffect(() => {
+                localStorage.setItem('darkMode', JSON.stringify(isDark));
+                document.body.classList.toggle('dark', isDark);
+            }, [isDark]);
+            return [isDark, setIsDark];
+        };
+
+        const Icon = ({ name, size = 20, className = "" }) => {
+            const iconRef = useRef(null);
+            useEffect(() => {
+                if (typeof window.lucide !== 'undefined' && iconRef.current) {
+                    window.lucide.createIcons({ root: iconRef.current, attrs: { "stroke-width": 2.5, class: className }, name: name, nameAttr: 'data-lucide' });
+                }
+            }, [name, className]);
+            return <span ref={iconRef} key={name} className="inline-flex items-center justify-center"><i data-lucide={name} style={{ width: size, height: size }}></i></span>;
+        };
+
+        const Toast = ({ message, type = 'error', onClose }) => {
+            useEffect(() => { const timer = setTimeout(onClose, 3000); return () => clearTimeout(timer); }, [onClose]);
+            const bgColor = type === 'error' ? 'bg-[#ef4444] shadow-red-200' : 'bg-[#06C755] shadow-green-200';
+            const iconName = type === 'error' ? 'alert-circle' : 'check-circle';
+            return (
+                <div className={`fixed top-0 left-1/2 z-[200] flex items-center gap-3 px-6 py-4 rounded-full shadow-xl text-white font-bold text-sm tracking-wide toast-enter ${bgColor} backdrop-blur-md`}>
+                    <Icon name={iconName} size={20} className="text-white" />
+                    <span>{message}</span>
+                </div>
+            );
+        };
+
+        const FieldError = ({ message }) => message ? <div className="field-error"><Icon name="alert-circle" size={12} /><span>{message}</span></div> : null;
+        
+        const SkeletonInput = () => <div className="space-y-1.5"><div className="skeleton h-4 w-24"></div><div className="skeleton h-12 w-full"></div></div>;
+        const SkeletonSection = () => <div className="glass-card p-8 space-y-6"><div className="skeleton h-6 w-48 mb-6"></div><div className="grid md:grid-cols-2 gap-6"><SkeletonInput /><SkeletonInput /><SkeletonInput /><SkeletonInput /></div></div>;
+
+        const InputWithError = ({ name, type = 'text', value, onChange, placeholder, error, className = '', inputMode, pattern, step, min }) => (
+            <div className="space-y-1">
+                <input name={name} id={name} type={type} inputMode={inputMode} pattern={pattern} step={step} min={min} value={value} onChange={onChange} 
+                    className={`w-full cute-input rounded-xl px-5 py-3.5 font-bold text-[#736357] dark:text-[#F7E7B5] ${error ? 'input-error shake-error' : ''} ${className}`} placeholder={placeholder} />
+                <FieldError message={error} />
+            </div>
+        );
+
+        const HistoryModal = ({ records, onClose, onSelect }) => {
+            return (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#5D4D41]/40 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-2xl relative">
+                        <div className="bg-[#736357] p-6 text-white text-center">
+                            <h3 className="text-xl font-bold">Demo 模式提示</h3>
+                        </div>
+                        <div className="p-6 text-center space-y-4">
+                            <p className="text-slate-500">此為展示用範本，無連結真實資料庫。</p>
+                            <p className="text-sm">在正式版中，此處會顯示該電話號碼對應的歷史寵物資料，方便舊客快速帶入。</p>
+                        </div>
+                        <div className="p-4 bg-white dark:bg-gray-800 border-t border-slate-100">
+                            <button onClick={onClose} className="w-full py-3 bg-[#736357] text-white rounded-xl font-bold hover:bg-[#5e5046]">關閉</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const SuccessReceipt = ({ data, signature, onClose }) => {
+            const isBoarding = !!data.checkin_date;
+            return (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#5D4D41]/40 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto">
+                        <div className="bg-[#736357] p-8 pb-10 text-center relative overflow-hidden flex flex-col justify-center min-h-[140px]">
+                            <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+                            <div className="relative z-10 space-y-2">
+                                <h2 className="text-3xl font-black text-white tracking-wide">預約成功 (Demo)</h2>
+                                <div className="inline-flex items-center gap-1.5 bg-black/10 px-3 py-1 rounded-lg backdrop-blur-sm">
+                                    <Icon name="info" size={12} className="text-[#F7E7B5]"/>
+                                    <p className="text-[#F7E7B5] text-xs font-bold tracking-wider">此為範本演示，不會實際寄信</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="px-8 pb-8 pt-6 bg-[#fcfbf9] dark:bg-gray-900 space-y-6">
+                            <div className="text-center text-slate-500 text-sm">恭喜！您已完成前端表單流程。</div>
+                            <div className="flex gap-4 p-5 bg-white dark:bg-gray-800 rounded-2xl border border-slate-100 dark:border-gray-700 shadow-sm">
+                                <div className="flex-1 space-y-1">
+                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">飼主</span>
+                                    <div className="font-black text-[#736357] dark:text-[#F7E7B5] text-lg leading-tight">{data.owner_name}</div>
+                                </div>
+                                <div className="w-[1px] bg-slate-100 dark:bg-gray-700 my-1"></div>
+                                <div className="flex-1 space-y-1 text-right">
+                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">寵物</span>
+                                    <div className="font-black text-[#736357] dark:text-[#F7E7B5] text-lg leading-tight">{data.pet_name}</div>
+                                </div>
+                            </div>
+                            <div className="pt-2">
+                                <button onClick={onClose} className="w-full py-4 bg-[#736357] text-white rounded-2xl font-bold shadow-lg hover:bg-[#5e5046] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group">
+                                    <div className="bg-white/20 p-1 rounded-full group-hover:rotate-90 transition-transform"><Icon name="x" size={16} /></div>
+                                    關閉並重置表單
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )
+        }
+
+        const UnifiedLineSection = () => {
+            const [lineConfirmed, setLineConfirmed] = useState(false);
+            return (
+                <div className="glass-card section-highlight overflow-hidden border-none bg-white dark:bg-gray-800 p-6 md:p-8 shadow-sm relative">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#06C755]/10 rounded-full blur-3xl"></div>
+                    <div className="relative z-10 space-y-6">
+                        <div className="text-center space-y-2">
+                            <h3 className="text-2xl font-black text-[#736357] dark:text-[#F7E7B5] flex items-center justify-center gap-2">
+                                <img src="line.png" className="w-8 h-8 object-contain" alt="LINE" onError={(e)=>e.target.style.display='none'} />
+                                加入官方 LINE (範本)
+                            </h3>
+                            <p className="text-sm text-slate-500 font-bold">ID: @shibastudio</p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <a href="#" className="bg-[#fbf9f6] dark:bg-gray-700 border-2 border-[#06C755]/20 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:bg-[#06C755]/5 transition-colors group">
+                                <div className="w-8 h-8 rounded-full bg-[#06C755] text-white flex items-center justify-center font-black text-sm mb-1">1</div>
+                                <span className="font-bold text-lg text-[#06C755]">點擊加入好友</span>
+                                <div className="mt-2 w-full py-2 bg-[#06C755] text-white rounded-lg text-center font-bold text-sm shadow-md">立即加 LINE</div>
+                            </a>
+                            <div className="bg-red-50 dark:bg-red-900/10 border-2 border-red-200 dark:border-red-900 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 text-center">
+                                <div className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center font-black text-sm mb-1">2</div>
+                                <span className="font-bold text-lg text-red-600 dark:text-red-400">務必「傳送貼圖」</span>
+                            </div>
+                        </div>
+                        <button type="button" onClick={() => setLineConfirmed(!lineConfirmed)} className={`w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold transition-all duration-300 border-2 ${lineConfirmed ? 'bg-[#06C755] text-white border-[#06C755] shadow-lg' : 'bg-white dark:bg-gray-700 text-slate-400 border-slate-200 hover:border-[#06C755]'}`}>
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${lineConfirmed ? 'border-white bg-white/20' : 'border-current'}`}>{lineConfirmed && <Icon name="check" size={12} />}</div>
+                            {lineConfirmed ? "OK！我已加入並傳送貼圖" : "確認：我已完成上述兩步驟"}
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+        
+        const DarkModeToggle = ({ isDark, setIsDark }) => (
+            <button onClick={() => setIsDark(!isDark)} className="dark-mode-toggle" title={isDark ? '切換淺色模式' : '切換深色模式'}>
+                <Icon name={isDark ? "sun" : "moon"} size={24} />
+            </button>
+        );
+        const App = () => {
+            const getInitialState = useCallback(() => {
+                const hash = window.location.hash;
+                if (hash === '#boarding') return { view: 'client', isBoarding: true };
+                if (hash === '#grooming') return { view: 'client', isBoarding: false };
+                return { view: 'entry', isBoarding: false };
+            }, []);
+            const initialState = getInitialState();
+            const [view, setView] = useState(initialState.view); 
+            const [isBoarding, setIsBoarding] = useState(initialState.isBoarding);
+            const [showFullSig, setShowFullSig] = useState(false);
+            const [realtimeSig, setRealtimeSig] = useState(null);
+            const [activeModal, setActiveModal] = useState(null);
+            const [termsRead, setTermsRead] = useState({ boarding: false, grooming: false, senior: false, boardingRisk: false });
+            
+            const handleTermAgree = (type) => {
+                setTermsRead(prev => ({ ...prev, [type]: true }));
+                if (type === 'boarding') setFormData(prev => ({ ...prev, boarding_notice_agree: true }));
+            };
+
+            const [isSubmitting, setIsSubmitting] = useState(false);
+            const [showSuccess, setShowSuccess] = useState(false);        
+            const [toast, setToast] = useState(null);
+            const [errors, setErrors] = useState({});
+            const [isProcessingImg, setIsProcessingImg] = useState(false);
+            const [isPageLoading, setIsPageLoading] = useState(true);
+            const [isDark, setIsDark] = useDarkMode();
+            const [isSearching, setIsSearching] = useState(false);
+            const [showHistoryModal, setShowHistoryModal] = useState(false);
+            const [historyRecords, setHistoryRecords] = useState([]);
+
+            const [formData, setFormData] = useState({
+                email: '', owner_name: '', owner_id: '', phone: '', address: '', 
+                emergency_name: '', emergency_phone: '',
+                pet_name: '', breed: '', sex: '', age: '', age_months: '', is_under_one: false, weight: '', fix: '',
+                chip_status: '', chip_id: '', preferred_clinic: '',
+                grooming_temperament: '', dog_traits: [], is_barking: '', barking_detail: '',
+                medical_status: '', medical_history: [], medical_history_other: '',
+                checkin_date: '', checkout_date: '', stay_exp: '',
+                crate_status: [], food_aggr: '', pad_toilet: '',
+                vaccine: '', deworm: '', deworm_brand: '', vaccine_file: null,
+                allergy: '', personality: '', special_notes: '', boarding_notice_agree: false,
+                service_type: '', service_type_other: '', pickup_time: '', legal_agree: false
+            });
+
+            const fullSigCanvasRef = useRef(null);
+            const padInstance = useRef(null);
+
+            const actualAge = useMemo(() => {
+                if (formData.is_under_one && formData.age_months) return parseFloat(formData.age_months) / 12;
+                return parseFloat(formData.age) || 0;
+            }, [formData.age, formData.age_months, formData.is_under_one]);
+
+            const isHighRisk = useMemo(() => actualAge >= 8 || actualAge < 0.42, [actualAge]);
+            const riskType = useMemo(() => { if (actualAge >= 8) return 'senior'; if (actualAge < 0.42) return 'puppy'; return null; }, [actualAge]);
+
+            const allTermsRead = useMemo(() => {
+                if (!termsRead.grooming) return false;
+                if (isBoarding && !termsRead.boarding) return false;
+                if (isHighRisk && !termsRead.senior) return false;
+                if (isBoarding && isHighRisk && !termsRead.boardingRisk) return false;
+                return true;
+            }, [isBoarding, isHighRisk, termsRead]);
+
+            useEffect(() => { const timer = setTimeout(() => setIsPageLoading(false), 300); return () => clearTimeout(timer); }, []);
+            const showToast = (message, type = 'error') => setToast({ message, type });
+
+            useEffect(() => {
+                const handleHashChange = () => {
+                    const hash = window.location.hash;
+                    let newState = { view: 'entry', isBoarding: false };
+                    if (hash === '#boarding') newState = { view: 'client', isBoarding: true };
+                    else if (hash === '#grooming') newState = { view: 'client', isBoarding: false };
+                    setView(newState.view);
+                    setIsBoarding(newState.isBoarding);
+                    if (newState.view === 'entry') window.scrollTo({top: 0, behavior: 'smooth'});
+                    else setTimeout(() => window.scrollTo({top: 0, behavior: 'smooth'}), 100);
+                };
+                window.addEventListener('hashchange', handleHashChange);
+                window.addEventListener('popstate', handleHashChange);
+                return () => { window.removeEventListener('hashchange', handleHashChange); window.removeEventListener('popstate', handleHashChange); };
+            }, []);
+
+            const selectServiceFlow = (type) => {
+                const targetHash = type === 'both' ? '#boarding' : '#grooming';
+                if (window.location.hash === targetHash) {
+                    window.location.hash = '';
+                    setTimeout(() => { window.location.hash = targetHash; }, 0);
+                } else { window.location.hash = targetHash; }
+            };
+
+            const stayDuration = useMemo(() => {
+                if (!formData.checkin_date || !formData.checkout_date) return null;
+                const start = new Date(formData.checkin_date);
+                const end = new Date(formData.checkout_date);
+                const diffTime = end - start;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays > 0 ? diffDays : null;
+            }, [formData.checkin_date, formData.checkout_date]);
+
+            const handleChange = (field, value) => {
+                let finalVal = value;
+                if (field === 'email') finalVal = value.toLowerCase();
+                if (field === 'owner_id') finalVal = value.toUpperCase();
+                setFormData(prev => ({ ...prev, [field]: finalVal }));
+                if (errors[field]) setErrors(prev => ({ ...prev, [field]: null }));
+            };
+
+            // --- Demo Search: Mock ---
+            const handleSearchHistory = async () => {
+                setIsSearching(true);
+                // 模擬網絡延遲
+                setTimeout(() => {
+                    setIsSearching(false);
+                    setShowHistoryModal(true); // 顯示 Demo 提示
+                }, 800);
+            };
+
+            const handleApplyHistory = (record) => { /* Demo mode doesn't use this */ };
+
+            const toggleArrayField = (field, value) => {
+                setFormData(prev => {
+                    const currentArr = Array.isArray(prev[field]) ? prev[field] : [];
+                    let updatedArr = currentArr.includes(value) ? currentArr.filter(i => i !== value) : [...currentArr, value];
+                    if (updatedArr.length > 0 && errors[field]) setErrors(prev => ({ ...prev, [field]: null }));
+                    return { ...prev, [field]: updatedArr };
+                });
+            };
+
+            const validateEmail = (email) => /\S+@\S+\.com/.test(email);
+            const validatePhone = (phone) => /^09\d{8}$/.test(phone);
+            const validateTwID = (id) => /^[A-Z][12]\d{8}$/.test(id); // 簡化版驗證 for demo
+
+            const ERROR_MESSAGES = {
+                email: '請輸入有效的電子郵件', owner_name: '請輸入飼主姓名', phone: '請輸入有效的手機號碼',
+                pet_name: '請輸入寵物名字', breed: '請輸入寵物品種', weight: '請輸入體重',
+                sex: '請選擇性別', fix: '請選擇結紮狀況', chip_status: '請選擇晶片狀態',
+                grooming_temperament: '請評估美容性情', dog_traits: '請選擇社交狀況',
+                medical_status: '請選擇病史', checkin_date: '請選擇日期', checkout_date: '請選擇日期',
+                legal_agree: '請勾選同意契約', signature: '請簽名'
+            };
+
+            const handleSubmit = async () => {
+                const newErrors = {};
+                // --- 簡化版驗證 ---
+                if (!formData.owner_name) newErrors.owner_name = ERROR_MESSAGES.owner_name;
+                if (!formData.phone) newErrors.phone = ERROR_MESSAGES.phone;
+                if (!formData.pet_name) newErrors.pet_name = ERROR_MESSAGES.pet_name;
+                
+                // 條款閱讀驗證
+                if (!allTermsRead) {
+                    showToast("⚠️ 請先點擊並詳閱上方所有條款", "error");
+                    newErrors.legal_agree = "請先完成條款閱讀";
+                    setErrors(newErrors);
+                    return; 
+                }
+                if (!formData.legal_agree) newErrors.legal_agree = ERROR_MESSAGES.legal_agree;
+                if (!realtimeSig) newErrors.signature = ERROR_MESSAGES.signature;
+
+                setErrors(newErrors);
+                if (Object.keys(newErrors).length > 0) {
+                    showToast(`⚠️ 請填寫必填欄位`);
+                    return;
+                }
+
+                setIsSubmitting(true);
+                // --- Demo: 模擬提交 ---
+                setTimeout(() => {
+                    setIsSubmitting(false);
+                    setShowSuccess(true);
+                    // 清除草稿 (如果有)
+                    localStorage.removeItem('wangwang_form_draft');
+                }, 1500);
+            };
+
+            const handleSuccessClose = () => {
+                setShowSuccess(false);
+                window.location.reload();
+            }
+
+            // Signature Logic
+            useEffect(() => {
+                if (showFullSig && fullSigCanvasRef.current) {
+                    const canvas = fullSigCanvasRef.current;
+                    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                    canvas.width = canvas.offsetWidth * ratio;
+                    canvas.height = canvas.offsetHeight * ratio;
+                    const ctx = canvas.getContext("2d");
+                    ctx.scale(ratio, ratio);
+                    padInstance.current = new window.SignaturePad(canvas, { penColor: "rgb(115, 99, 87)" });
+                }
+            }, [showFullSig]);
+
+            const pillBtn = (field, val, active) => (
+                <button type="button" onClick={() => handleChange(field, val)} 
+                    className={`pill-button flex-1 py-3.5 rounded-xl font-bold text-sm border-2 transition-all duration-300 transform ${active ? 'bg-[#736357] text-white border-[#736357] shadow-lg scale-[1.02]' : 'bg-white dark:bg-gray-700 text-[#736357] dark:text-gray-300 border-[#F7E7B5] hover:border-[#736357]'}`}>
+                    <span className="flex items-center justify-center gap-1.5">{active && <Icon name="check-circle" size={14} />}{val}</span>
+                </button>
+            );if (view === 'entry') {
+                return (
+                    <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-[#fefcf9] dark:bg-gray-900 relative overflow-hidden">
+                        <DarkModeToggle isDark={isDark} setIsDark={setIsDark} />
+                        <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#F7E7B5]/30 rounded-full blur-[100px] mix-blend-multiply animate-pulse pointer-events-none"></div>
+                        <div className="w-48 h-48 md:w-64 md:h-64 mx-auto mb-10 relative">
+                             {/* 請替換為開發柴 Logo */}
+                            <img src="./logo.png" alt="開發柴工作室" className="w-full h-full object-contain drop-shadow-2xl" />
+                        </div>
+                        
+                        <div className="grid md:grid-cols-2 gap-8 w-full max-w-4xl px-4 relative z-10">
+                            <button onClick={() => selectServiceFlow('grooming')} className="glass-card p-10 text-left group hover:translate-y-[-5px] bg-white dark:bg-gray-800 border-b-8 section-highlight relative overflow-hidden">
+                                <div className="w-16 h-16 bg-[#736357]/5 text-[#736357] dark:text-[#F7E7B5] rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[#736357] group-hover:text-white transition-all">
+                                    <Icon name="scissors" size={32} />
+                                </div>
+                                <h3 className="text-3xl font-black mb-3 text-[#736357] dark:text-[#F7E7B5]">美容預約 (範本)</h3>
+                                <p className="text-slate-400 font-medium text-sm mb-8 leading-relaxed">展示美容預約流程與合約簽署</p>
+                                <div className="text-[#736357] font-bold flex items-center gap-2 text-sm uppercase">
+                                    開始體驗 <Icon name="arrow-right" size={16}/>
+                                </div>
+                            </button>
+                            <button onClick={() => selectServiceFlow('both')} className="glass-card p-10 text-left group hover:translate-y-[-5px] bg-white dark:bg-gray-800 border-b-8 border-[#F7E7B5] relative overflow-hidden">
+                                <div className="w-16 h-16 bg-[#F7E7B5]/30 text-[#736357] dark:text-[#F7E7B5] rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[#F7E7B5] transition-all">
+                                    <Icon name="home" size={32} />
+                                </div>
+                                <h3 className="text-3xl font-black mb-3 text-[#736357] dark:text-[#F7E7B5]">住宿預約 (範本)</h3>
+                                <p className="text-slate-400 font-medium text-sm mb-8 leading-relaxed">展示住宿日期選擇與風險告知流程</p>
+                                <div className="text-[#736357] font-bold flex items-center gap-2 text-sm uppercase">
+                                    開始體驗 <Icon name="arrow-right" size={16}/>
+                                </div>
+                            </button>
+                        </div>
+                        <footer className="py-8 text-center relative z-20 text-slate-400 text-xs">
+                            © 2026 開發柴工作室 Shiba Studio (Demo Version)
+                        </footer>
+                    </div>
+                );
+            }
+
+            if (isPageLoading) return <div className="min-h-screen pt-32 px-4 max-w-4xl mx-auto"><SkeletonSection /></div>;
+
+            return (
+                <div className="min-h-screen pb-32">
+                    <DarkModeToggle isDark={isDark} setIsDark={setIsDark} />
+                    {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+                    {showSuccess && <SuccessReceipt data={formData} signature={realtimeSig} onClose={handleSuccessClose} />}
+                    {showHistoryModal && <HistoryModal records={historyRecords} onClose={() => setShowHistoryModal(false)} onSelect={handleApplyHistory} />}
+
+                    <nav className="fixed top-0 w-full z-40 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-b border-[#736357]/5 shadow-sm">
+                        <div className="px-6 py-4 flex justify-between items-center max-w-7xl mx-auto">
+                            <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.hash = ''}>
+                                <img src="./logo.png" alt="Logo" className="w-8 h-8 object-contain" />
+                                <div className="font-black text-xl text-[#736357] dark:text-[#F7E7B5]">開發柴 (Demo)</div>
+                            </div>
+                            <button onClick={() => window.location.hash = ''} className="text-xs font-bold text-[#736357]/60 border border-[#736357]/10 px-4 py-2 rounded-full flex items-center gap-2">
+                                <Icon name="arrow-left" size={14}/> 返回首頁
+                            </button>
+                        </div>
+                    </nav>
+
+                    <main className="pt-32 px-4 max-w-4xl mx-auto space-y-8">
+                        <div className="text-center space-y-3 pb-4">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#736357]/5 text-[#736357] text-xs font-bold uppercase">
+                                {isBoarding ? "Boarding Service Demo" : "Grooming Service Demo"}
+                            </div>
+                            <h2 className="text-3xl md:text-4xl font-black text-[#736357] dark:text-[#F7E7B5]">
+                                {isBoarding ? "寵物住宿預約 (範本)" : "寵物美容預約 (範本)"}
+                            </h2>
+                        </div>
+
+                        <UnifiedLineSection />
+                        
+                        <div className="space-y-10">
+                            {/* 1. 飼主資料 */}
+                            <section className="glass-card p-8 md:p-10 space-y-8 section-highlight">
+                                <div className="flex items-center gap-4 border-b border-[#736357]/10 pb-6">
+                                    <div className="w-10 h-10 rounded-full bg-[#736357]/5 flex items-center justify-center text-[#736357]"><Icon name="user" size={20}/></div>
+                                    <h3 className="text-xl font-bold text-[#736357] dark:text-[#F7E7B5]">飼主基本資料</h3>
+                                </div>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <InputWithError name="email" type="email" value={formData.email} onChange={e=>handleChange('email', e.target.value)} placeholder="email@demo.com" error={errors.email} />
+                                    <InputWithError name="owner_name" value={formData.owner_name} onChange={e=>handleChange('owner_name', e.target.value)} placeholder="王小明" error={errors.owner_name} />
+                                    <div className="space-y-1.5">
+                                        <div className="flex gap-2">
+                                            <div className="flex-1">
+                                                <InputWithError name="phone" type="tel" value={formData.phone} onChange={e=>handleChange('phone', e.target.value)} placeholder="0912345678" error={errors.phone} />
+                                            </div>
+                                            <button onClick={handleSearchHistory} disabled={isSearching} className="px-4 bg-[#736357] text-white rounded-xl font-bold text-sm shadow-md h-[54px]">
+                                                {isSearching ? <Icon name="loader-2" size={16} className="animate-spin" /> : "舊客Demo"}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <InputWithError name="address" value={formData.address} onChange={e=>handleChange('address', e.target.value)} placeholder="台北市..." error={errors.address} />
+                                    <InputWithError name="emergency_name" value={formData.emergency_name} onChange={e=>handleChange('emergency_name', e.target.value)} placeholder="緊急聯絡人" className="border-red-50 bg-red-50/10" />
+                                    <InputWithError name="emergency_phone" value={formData.emergency_phone} onChange={e=>handleChange('emergency_phone', e.target.value)} placeholder="緊急聯絡電話" className="border-red-50 bg-red-50/10" />
+                                </div>
+                            </section>
+
+                            {/* 2. 寵物資料 */}
+                            <section className="glass-card p-8 md:p-10 space-y-8 section-highlight">
+                                <div className="flex items-center gap-4 border-b border-[#736357]/10 pb-6">
+                                    <div className="w-10 h-10 rounded-full bg-[#736357]/5 flex items-center justify-center text-[#736357]"><Icon name="github" size={20}/></div>
+                                    <h3 className="text-xl font-bold text-[#736357] dark:text-[#F7E7B5]">寵物詳細資料</h3>
+                                </div>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    {isBoarding && (
+                                        <>
+                                            <InputWithError name="checkin_date" type="date" value={formData.checkin_date} onChange={e=>handleChange('checkin_date', e.target.value)} error={errors.checkin_date} />
+                                            <InputWithError name="checkout_date" type="date" value={formData.checkout_date} onChange={e=>handleChange('checkout_date', e.target.value)} error={errors.checkout_date} />
+                                            {stayDuration && <div className="md:col-span-2 flex justify-center py-2"><div className="stay-duration-badge"><span>住宿天數：{stayDuration} 晚</span></div></div>}
+                                        </>
+                                    )}
+                                    <InputWithError name="pet_name" value={formData.pet_name} onChange={e=>handleChange('pet_name', e.target.value)} placeholder="寵物名字" error={errors.pet_name} />
+                                    <InputWithError name="breed" value={formData.breed} onChange={e=>handleChange('breed', e.target.value)} placeholder="品種 (如: 柴犬)" error={errors.breed} />
+                                    
+                                    {/* 簡化展示其餘欄位，如性別、年齡等 UI 保持不變，此處略縮以符合長度限制 */}
+                                    <div className="md:col-span-2">
+                                        <label className="text-xs font-bold text-slate-400 ml-1">社交狀況 (可複選)</label>
+                                        <div className="flex flex-wrap gap-2 mt-2">
+                                            {['親人','親狗','膽小','有攻擊性'].map(v => (
+                                                <button type="button" key={v} onClick={()=>toggleArrayField('dog_traits', v)} className={`pill-button px-4 py-2 rounded-xl text-sm border ${formData.dog_traits.includes(v) ? 'bg-[#736357] text-white' : 'bg-white text-slate-500'}`}>{v}</button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    {/* 疫苗上傳 Demo */}
+                                    <div className="md:col-span-2 space-y-2">
+                                        <label className="text-xs font-bold text-slate-400">疫苗手冊 (Demo 不會實際上傳)</label>
+                                        <label className="w-full flex items-center justify-center gap-2 py-6 border-2 border-dashed border-[#F7E7B5] bg-[#F7E7B5]/5 rounded-2xl cursor-pointer">
+                                            <Icon name="image" size={20} className="text-[#736357]" />
+                                            <span className="text-sm font-bold text-[#736357]">點擊選擇圖片 (模擬上傳)</span>
+                                            <input type="file" className="hidden" onChange={(e)=>{
+                                                if(e.target.files[0]) {
+                                                    setIsProcessingImg(true);
+                                                    setTimeout(()=>{
+                                                        // 假裝上傳成功，使用一個 placeholder 圖片
+                                                        setFormData(prev=>({...prev, vaccine_file: 'https://placehold.co/600x400?text=Vaccine+Card'}));
+                                                        setIsProcessingImg(false);
+                                                        showToast("✅ 模擬圖片處理成功", "success");
+                                                    }, 1000);
+                                                }
+                                            }} />
+                                        </label>
+                                        {formData.vaccine_file && <div className="text-center text-xs text-green-600 font-bold">已模擬上傳成功</div>}
+                                    </div>
+                                </div>
+                            </section>{/* 3. 法律條款 */}
+                            <section className="glass-card p-8 md:p-10 space-y-10 section-highlight">
+                                <div className="flex items-center gap-4 border-b border-[#736357]/10 pb-6">
+                                    <div className="w-10 h-10 rounded-full bg-[#736357]/5 flex items-center justify-center text-[#736357]"><Icon name="file-text" size={20}/></div>
+                                    <h3 className="text-xl font-bold text-[#736357] dark:text-[#F7E7B5]">服務條款與簽署</h3>
+                                </div>
+                                <div className="bg-[#fefcf9] dark:bg-gray-900 rounded-[2.5rem] p-8 space-y-6 border border-slate-100 dark:border-gray-700">
+                                    {/* 條款按鈕 */}
+                                    <button type="button" onClick={() => setActiveModal('grooming')} 
+                                        className={`w-full flex items-center justify-between p-5 rounded-2xl border-2 transition-all ${termsRead.grooming ? 'bg-green-50 border-green-200' : 'bg-white border-blue-200'}`}>
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${termsRead.grooming ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-500'}`}><Icon name="file-text" size={20}/></div>
+                                            <span className="font-bold text-[#736357] dark:text-[#F7E7B5]">{termsRead.grooming ? '已詳閱美容契約條款' : '請點擊詳閱【美容契約條款】'}</span>
+                                        </div>
+                                    </button>
+
+                                    {/* 住宿條款 (依條件顯示) */}
+                                    {isBoarding && (
+                                        <button type="button" onClick={() => setActiveModal('boarding')} 
+                                            className={`w-full flex items-center justify-between p-5 rounded-2xl border-2 transition-all ${termsRead.boarding ? 'bg-green-50 border-green-200' : 'bg-white border-orange-200'}`}>
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${termsRead.boarding ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-500'}`}><Icon name="home" size={20}/></div>
+                                                <span className="font-bold text-[#736357] dark:text-[#F7E7B5]">{termsRead.boarding ? '已詳閱住宿契約條款' : '請點擊詳閱【住宿契約條款】'}</span>
+                                            </div>
+                                        </button>
+                                    )}
+
+                                    {/* 同意勾選 */}
+                                    <div className={`transition-all duration-300 ${!allTermsRead ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}>
+                                        <label className="flex items-center gap-4 cursor-pointer bg-white dark:bg-gray-800 p-7 rounded-[2rem] border-2 border-[#736357]/20">
+                                            <input type="checkbox" checked={formData.legal_agree} onChange={e=> allTermsRead && handleChange('legal_agree', e.target.checked)} disabled={!allTermsRead} className="accent-[#736357] w-6 h-6" />
+                                            <span className="font-bold text-[#736357] dark:text-[#F7E7B5]">我已詳閱並同意以上所有條款 (Demo)</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                {/* 店家資訊 (Demo) */}
+                                <div className="pt-6 border-t border-[#736357]/10 space-y-4">
+                                    <div className="flex items-center gap-2"><Icon name="store" size={16}/> <h4 className="font-bold text-[#736357] dark:text-[#F7E7B5]">服務提供者資訊 (範本)</h4></div>
+                                    <div className="bg-[#fbf9f6] dark:bg-gray-800 rounded-2xl p-5 border border-[#736357]/10 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                        <div><span className="text-slate-400 text-xs">店家名稱</span><div className="font-bold text-[#736357] dark:text-[#F7E7B5]">開發柴寵物旅館 (Demo)</div></div>
+                                        <div><span className="text-slate-400 text-xs">負責人</span><div className="font-bold text-[#736357] dark:text-[#F7E7B5]">開發柴</div></div>
+                                        <div><span className="text-slate-400 text-xs">電話</span><div className="font-bold text-[#736357] dark:text-[#F7E7B5]">0900-123-456</div></div>
+                                        <div><span className="text-slate-400 text-xs">地址</span><div className="font-bold text-[#736357] dark:text-[#F7E7B5]">台北市示範區 (範本地址)</div></div>
+                                    </div>
+                                </div>
+
+                                {/* 簽名板 */}
+                                <div className="space-y-4" id="signature">
+                                    <label className="font-bold text-[#736357] dark:text-[#F7E7B5]">數位簽名 *</label>
+                                    {realtimeSig ? (
+                                        <div className="bg-white dark:bg-gray-800 rounded-2xl border p-4 flex flex-col items-center">
+                                            <img src={realtimeSig} className="max-h-[100px]" />
+                                            <button onClick={()=>setRealtimeSig(null)} className="text-red-500 text-xs font-bold mt-2">清除重簽</button>
+                                        </div>
+                                    ) : (
+                                        <button type="button" onClick={()=>setShowFullSig(true)} className="w-full h-40 border-2 border-dashed border-[#736357]/30 rounded-2xl flex flex-col items-center justify-center text-[#736357] hover:bg-[#F7E7B5]/10">
+                                            <Icon name="pen-tool" size={24}/>
+                                            <span className="font-bold mt-2">點擊簽名</span>
+                                        </button>
+                                    )}
+                                </div>
+
+                                <button type="button" onClick={handleSubmit} disabled={isSubmitting} className="w-full py-6 bg-[#736357] text-white rounded-[2rem] font-bold text-xl shadow-xl hover:bg-[#5D4D41] disabled:opacity-50">
+                                    {isSubmitting ? "處理中..." : "確認並提交 (Demo)"}
+                                </button>
+                            </section>
+                        </div>
+                    </main>
+
+                    {/* 全螢幕簽名板 UI */}
+                    {showFullSig && (
+                        <div className="fullscreen-signature bg-white dark:bg-gray-900 flex flex-col">
+                            <div className="flex items-center justify-between p-4 bg-[#736357] text-white">
+                                <span>請簽名</span>
+                                <button onClick={()=>setShowFullSig(false)}><Icon name="x"/></button>
+                            </div>
+                            <div className="flex-1 bg-slate-100 p-4">
+                                <canvas ref={fullSigCanvasRef} className="w-full h-full bg-white rounded-xl shadow-sm touch-none"></canvas>
+                            </div>
+                            <div className="p-4 bg-white flex gap-4">
+                                <button onClick={()=>{padInstance.current?.clear()}} className="flex-1 py-4 bg-slate-200 rounded-xl font-bold">清除</button>
+                                <button onClick={()=>{
+                                    if(!padInstance.current.isEmpty()){
+                                        setRealtimeSig(padInstance.current.toDataURL());
+                                        setShowFullSig(false);
+                                    }
+                                }} className="flex-[2] py-4 bg-[#736357] text-white rounded-xl font-bold">確認</button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 條款 Modals (內容已替換為通用範本) */}
+                    <TermsModal isOpen={activeModal === 'grooming'} onClose={() => setActiveModal(null)} title="美容服務契約 (範本)" onAgree={() => handleTermAgree('grooming')}>
+                        <div className="space-y-4 text-sm">
+                            <p><strong>本契約為開發柴工作室之展示範本。</strong></p>
+                            <p>一、 飼主應誠實告知寵物健康狀況。</p>
+                            <p>二、 若有跳蚤壁蝨，將加收清潔費。</p>
+                            <p>三、 美容完成後請於一小時內接回。</p>
+                            <p>(此处省略詳細條款內容...)</p>
+                        </div>
+                    </TermsModal>
+
+                    <TermsModal isOpen={activeModal === 'boarding'} onClose={() => setActiveModal(null)} title="住宿服務契約 (範本)" onAgree={() => handleTermAgree('boarding')}>
+                        <div className="space-y-4 text-sm">
+                            <p><strong>本契約為開發柴工作室之展示範本。</strong></p>
+                            <p>一、 入住時間為 10:00 - 18:00。</p>
+                            <p>二、 需自備飼料，若無則另計費。</p>
+                            <p>(此处省略詳細條款內容...)</p>
+                        </div>
+                    </TermsModal>
+                    
+                    {/* 其他高風險告知 Modal 同理簡化，略 */}
+                    
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
