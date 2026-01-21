@@ -506,24 +506,75 @@
                 </section>
                 
                 <section class="glass-panel p-5">
-                    <button type="button" onclick="openTermsModal()" class="w-full py-3 border border-theme-brown/30 text-theme-brown rounded-xl text-sm font-bold mb-4 hover:bg-theme-brown hover:text-white transition flex items-center justify-center gap-2">
-                        <i data-lucide="file-text" class="w-4 h-4"></i> 寵物美容定型化契約 (點擊閱讀)
-                    </button>
-                    
-                    <label class="text-center block text-xs font-bold text-gray-400 tracking-widest uppercase mb-2">Signature</label>
-                    <div class="w-full h-32 bg-white border-2 border-dashed border-gray-200 rounded-xl relative">
-                        <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-300 pointer-events-none">
-                            <i data-lucide="pen-tool" class="w-6 h-6 mb-1"></i>
-                            <span class="text-xs">點擊開啟簽名板</span>
+<div class="bg-white border-2 border-theme-brown/20 rounded-2xl overflow-hidden mb-6 shadow-sm transition-all hover:border-theme-brown/40">
+        <button type="button" onclick="openTermsModal()" class="w-full p-4 flex items-center justify-between text-left hover:bg-theme-brown/5 transition-colors group border-b border-theme-brown/10">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-theme-brown/10 text-theme-brown flex items-center justify-center group-hover:bg-theme-brown group-hover:text-white transition-colors shrink-0">
+                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <span class="block text-sm font-bold text-theme-brown">寵物美容定型化契約</span>
+                    <span class="text-[10px] text-theme-sub opacity-70 group-hover:text-theme-orange transition-colors">點擊閱讀完整條款內容</span>
+                </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-theme-sub/30 group-hover:text-theme-brown transition-colors"></i>
+        </button>
+
+<label class="group relative flex items-center gap-3 p-4 cursor-pointer bg-theme-brown/[0.02] hover:bg-theme-brown/5 transition-colors select-none">
+    <input type="checkbox" id="termsCheck" onchange="toggleSubmitBtn()" class="peer sr-only">
+    
+    <div class="w-5 h-5 flex-shrink-0 rounded border-2 border-theme-sub/40 bg-white peer-checked:bg-theme-brown peer-checked:border-theme-brown transition-all flex items-center justify-center shadow-sm peer-checked:[&_svg]:opacity-100">
+        <i data-lucide="check" class="w-3.5 h-3.5 text-white opacity-0 transition-opacity stroke-[3]"></i>
+    </div>
+
+    <span class="text-xs font-bold text-theme-sub leading-relaxed group-hover:text-theme-brown transition-colors">
+        本人已詳閱並同意以上條款內容
+    </span>
+    
+    <div class="absolute inset-0 opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity border-2 border-theme-brown/20 rounded-b-xl"></div>
+</label>
+    </div>                    
+                    <div class="space-y-4 pt-4 border-t border-theme-brown/10" id="signature-section">
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-bold text-theme-brown flex items-center gap-2">
+                                <i data-lucide="pen-tool" class="w-4 h-4"></i> 數位簽名 <span class="text-theme-orange">*</span>
+                            </label>
+                            
+                            <button type="button" id="btn-clear-result" onclick="resetSignature()" class="hidden text-xs font-bold text-red-400 hover:text-red-500 flex items-center gap-1 transition-colors">
+                                <i data-lucide="trash-2" class="w-3 h-3"></i> 重新簽名
+                            </button>
                         </div>
-                    </div>
-                    <div class="flex justify-between mt-2 text-xs text-theme-sub font-bold">
-                        <span>清除簽名</span>
-                        <span id="date-display">日期：2026/1/21</span>
+                        
+                        <button type="button" id="btn-open-pad" onclick="openSignatureModal()" 
+                            class="w-full min-h-[160px] rounded-2xl border-2 border-dashed border-theme-brown/30 bg-white hover:bg-theme-brown/5 hover:border-theme-brown transition-all flex flex-col items-center justify-center gap-3 group">
+                            <div class="w-14 h-14 rounded-full bg-theme-brown/5 flex items-center justify-center text-theme-brown group-hover:scale-110 transition-transform">
+                                <i data-lucide="pen-tool" class="w-6 h-6"></i>
+                            </div>
+                            <div class="text-center">
+                                <span class="block text-sm font-bold text-theme-brown">點擊此處開始簽名</span>
+                                <span class="text-xs text-theme-sub opacity-70">將開啟全螢幕簽名板</span>
+                            </div>
+                        </button>
+
+                        <div id="signature-result" class="hidden space-y-3">
+                            <div class="bg-white rounded-2xl border border-theme-brown/20 p-4 flex justify-center items-center shadow-inner min-h-[120px]">
+                                <img id="sig-image" src="" alt="您的簽名" class="max-h-[100px] object-contain" />
+                            </div>
+                            <div class="flex items-center justify-end gap-2">
+                                <div class="bg-[#06C755]/10 text-[#06C755] px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1">
+                                    <i data-lucide="check-circle" class="w-3 h-3"></i> 已簽署
+                                </div>
+                                <div class="text-[10px] text-theme-sub font-bold bg-theme-brown/5 px-2 py-1 rounded-md">
+                                    簽署時間：<span id="sig-timestamp"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <input type="hidden" id="signature-data">
                     </div>
                 </section>
 
-                <button class="w-full bg-theme-brown text-white py-4 rounded-xl font-bold shadow-lg shadow-theme-brown/20 tracking-widest text-lg">確認並提交</button>
+                <button id="submitBtn" disabled class="w-full bg-theme-brown text-white py-4 rounded-xl font-bold shadow-lg shadow-theme-brown/20 tracking-widest text-lg opacity-50 transition-all">確認並提交</button>
                 <div class="h-12"></div>
             </form>
         </div>
@@ -531,26 +582,66 @@
     </main>
 
     <div id="termsModal" class="fixed inset-0 z-[100] hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl flex flex-col max-h-[80vh] animate-slide-up">
-            <div class="p-4 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="font-bold text-theme-brown">契約內容範本</h3>
-                <button onclick="closeTermsModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl flex flex-col max-h-[85vh] animate-slide-up">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-[#FFFBF0] rounded-t-2xl">
+                <h3 class="font-bold text-theme-brown flex items-center gap-2">
+                    <i data-lucide="scale" class="w-5 h-5"></i> 契約詳細條款
+                </h3>
+                <button onclick="closeTermsModal()" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition">
                     <i data-lucide="x" class="w-4 h-4 text-gray-500"></i>
                 </button>
             </div>
-            <div class="p-6 overflow-y-auto text-sm text-gray-600 leading-loose space-y-4">
-                <div class="bg-theme-orange/10 text-theme-orange p-3 rounded-lg text-center font-bold mb-4 border border-theme-orange/20">
-                    ( 此為契約範本，非正式法律效力 )
+            <div class="p-6 overflow-y-auto text-sm text-theme-sub leading-loose space-y-4">
+                <div class="bg-theme-orange/10 border border-theme-orange/20 rounded-xl p-4 mb-2">
+                    <p class="text-xs font-bold text-theme-orange leading-relaxed">
+                        <i data-lucide="info" class="w-3 h-3 inline mr-1"></i>
+                        以上資料由飼主本人提供，並同意將資料內容提供於公司存續期間以電話、簡訊和寄發DM方式，提供相關活動或促銷訊息、或帶寵物到動物醫院留存相關資料使用。
+                    </p>
                 </div>
-                <p><strong>第一條 (服務內容)</strong><br>乙方同意依甲方之要求，對甲方之寵物進行美容/洗澡服務。服務項目詳見本次服務內容勾選項目。</p>
-                <p><strong>第二條 (健康告知義務)</strong><br>甲方應誠實告知寵物之健康狀況（如心臟病、癲癇、懷孕等）、年齡、攻擊性及特殊習性。若因甲方未告知致生意外，乙方不負賠償責任。</p>
-                <p><strong>第三條 (緊急醫療)</strong><br>服務期間如寵物發生緊急傷病，甲方同意乙方得逕送特約動物醫院或鄰近醫院治療，醫療費用由甲方負擔。</p>
-                <p><strong>第四條 (逾時與留置)</strong><br>甲方應於約定時間接回寵物。逾時 2 小時以上，乙方得收取逾時費用 $150/小時。</p>
-                <p class="text-xs text-gray-400 mt-4 pt-4 border-t text-center">--- 範本內容結束 ---</p>
+                <ol class="list-decimal pl-5 space-y-3 text-xs text-justify marker:font-bold marker:text-theme-brown">
+                    <li>除本契約另有約定、特殊緊急情況、或不可抗力之情況外，未經飼主同意，店家不得將寵物帶離美容場所(同上店家地址)、轉售、轉讓或以其他變相方法作為其他用途。</li>
+                    <li>飼主應於美容當日，將寵物領回，如經通知1日內未領回，依動保法第29條第一款通知主管機關，為飼主惡意棄養，相關訂金為3萬~15萬元，其他衍生性費用將跟飼主求償，例:人員加班費等。</li>
+                    <li>寵物發生攻擊行為，如因飼主未善盡告知義務而造成店內人員傷亡、財物損毀等費用，將全額向飼主(寵物占有權人)求償。</li>
+                    <li>店家應按本契約約定內容提供一定品質之美容服務。若因可歸責於店家或其受僱人之事由，導致其提供之美容服務有瑕疵，造成飼主發生損失的情況，飼主得要求減少價金或解除契約。</li>
+                    <li>本契約之任一方得隨時終止本契約，若因本契約之中止而生損害之一方得向他方請求賠償。</li>
+                    <li>於美容服務期間，如發現寵物有異常狀態，應立即通知飼主並妥善處理，如發生異常狀態的原因可歸責於店家之操作行為，店家應負損害賠償責任，例:摔傷寵物等。</li>
+                    <li>因本契約所生之訴訟，雙方合意以地方法院為管轄法院。</li>
+                    <li>美容契約相關法條，附件如店内張貼之公告，如有需求請自行拍照留存。</li>
+                </ol>
             </div>
-            <div class="p-4 border-t border-gray-100">
-                <button onclick="closeTermsModal()" class="w-full bg-theme-brown text-white py-3 rounded-xl font-bold">我已閱讀並了解 (關閉)</button>
+            <div class="p-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
+                <button onclick="closeTermsModal()" class="w-full bg-theme-brown text-white py-3 rounded-xl font-bold hover:bg-theme-brownLight transition shadow-md">
+                    我已閱讀並了解 (關閉)
+                </button>
             </div>
+        </div>
+    </div>
+
+    <div id="signature-modal" class="fixed inset-0 z-[100] hidden bg-white flex flex-col animate-slide-up">
+        <div class="flex items-center justify-between p-4 bg-theme-brown text-white shrink-0">
+            <h3 class="font-bold text-base flex items-center gap-2">
+                <i data-lucide="pen-tool" class="w-5 h-5"></i> 請在下方簽名
+            </h3>
+            <button type="button" onclick="closeSignatureModal()" class="p-2 hover:bg-white/20 rounded-full transition-colors">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        
+        <div class="p-3 bg-gray-50 border-b border-gray-200 flex gap-3 shrink-0">
+            <button type="button" onclick="clearPad()" class="flex-1 py-3 bg-white text-theme-brown border border-theme-brown/30 rounded-xl font-bold flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-all">
+                <i data-lucide="eraser" class="w-4 h-4"></i> 清除
+            </button>
+            <button type="button" onclick="confirmSignature()" class="flex-[2] py-3 bg-theme-brown text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
+                <i data-lucide="check" class="w-4 h-4"></i> 確認簽名
+            </button>
+        </div>
+        
+        <div class="flex-1 relative bg-gray-100 touch-none overflow-hidden" id="canvas-container">
+            <div id="sig-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-gray-300 pointer-events-none">
+                <span class="text-4xl font-bold opacity-20">請簽名</span>
+                <span class="text-sm mt-2 opacity-40">建議手機直立書寫</span>
+            </div>
+            <canvas id="signature-pad" class="w-full h-full block"></canvas>
         </div>
     </div>
 
@@ -574,7 +665,10 @@
 
         // 設定今日日期
         const today = new Date();
-        document.getElementById('date-display').innerText = `日期：${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()}`;
+        const dateDisplay = document.getElementById('date-display');
+        if(dateDisplay) {
+            dateDisplay.innerText = `日期：${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()}`;
+        }
 
         // 頁面路由與導航狀態切換
         function router(page) {
@@ -665,7 +759,6 @@
 
         // 搜尋舊客按鈕功能 (預留介面)
         function handleSearchOldCustomer() {
-            // 這裡未來會串接 Supabase
             console.log("正在呼叫 Supabase 查詢 API...");
             alert("【開發提示】\n此按鈕後續將串接資料庫，\n用於查詢並自動帶入舊客資料。");
         }
@@ -677,6 +770,132 @@
         function closeTermsModal() {
             document.getElementById('termsModal').classList.add('hidden');
         }
+
+        // 控制提交按鈕狀態的邏輯 
+        function toggleSubmitBtn() {
+            const isChecked = document.getElementById('termsCheck').checked;
+            const btn = document.getElementById('submitBtn');
+            if (isChecked) {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+            } else {
+                btn.disabled = true;
+                btn.classList.add('opacity-50');
+            }
+        }
+
+        // === 全螢幕簽名板邏輯 ===
+        let signaturePad = null;
+        const modal = document.getElementById('signature-modal');
+        const canvas = document.getElementById('signature-pad');
+        
+        // 初始化 SignaturePad
+        function initSignaturePad() {
+            if (signaturePad) return;
+            
+            signaturePad = new SignaturePad(canvas, {
+                minWidth: 2,
+                maxWidth: 4, 
+                penColor: '#5D4037', // 主題深棕色
+                backgroundColor: 'rgba(255, 255, 255, 0)', // 透明背景
+                velocityFilterWeight: 0.7
+            });
+
+            // 開始畫的時候隱藏浮水印
+            signaturePad.addEventListener("beginStroke", () => {
+                document.getElementById('sig-placeholder').classList.add('hidden');
+            });
+        }
+
+        // 開啟全螢幕簽名板
+        function openSignatureModal() {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // 禁止背景捲動
+            
+            // 延遲初始化以確保 DOM 渲染完成
+            setTimeout(() => {
+                resizeCanvas();
+                initSignaturePad();
+                signaturePad.clear(); // 每次打開都清空
+                document.getElementById('sig-placeholder').classList.remove('hidden');
+            }, 100);
+        }
+
+        // 關閉 Modal
+        function closeSignatureModal() {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // 清除畫布
+        function clearPad() {
+            if (signaturePad) {
+                signaturePad.clear();
+                document.getElementById('sig-placeholder').classList.remove('hidden');
+            }
+        }
+
+        // 確認簽名
+        function confirmSignature() {
+            if (!signaturePad || signaturePad.isEmpty()) {
+                alert('⚠️ 請先完成簽名再送出');
+                return;
+            }
+
+            // 1. 取得圖片數據
+            const dataUrl = signaturePad.toDataURL('image/png'); 
+            
+            // 2. 更新 UI 顯示
+            const now = new Date();
+            const timeString = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+            
+            document.getElementById('sig-image').src = dataUrl;
+            document.getElementById('sig-timestamp').innerText = timeString;
+            document.getElementById('signature-data').value = dataUrl; // 存入隱藏欄位供表單提交用
+
+            // 3. 切換顯示狀態
+            document.getElementById('btn-open-pad').classList.add('hidden');
+            document.getElementById('signature-result').classList.remove('hidden');
+            document.getElementById('btn-clear-result').classList.remove('hidden');
+
+            // 4. 關閉 Modal 並捲動到底部
+            closeSignatureModal();
+            setTimeout(() => {
+                document.getElementById('signature-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+            
+            // 5. 觸發按鈕狀態檢查 (如果有的話)
+            if(typeof toggleSubmitBtn === 'function') toggleSubmitBtn();
+        }
+
+        // 重置/重新簽名
+        function resetSignature() {
+            document.getElementById('signature-data').value = '';
+            document.getElementById('signature-result').classList.add('hidden');
+            document.getElementById('btn-open-pad').classList.remove('hidden');
+            document.getElementById('btn-clear-result').classList.add('hidden');
+        }
+
+        // 調整畫布尺寸 (處理 Retina 螢幕模糊問題)
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            const container = document.getElementById('canvas-container');
+            
+            // 只有當尺寸真的改變時才重置，避免不必要的閃爍
+            if (canvas.width !== container.offsetWidth * ratio || canvas.height !== container.offsetHeight * ratio) {
+                 canvas.width = container.offsetWidth * ratio;
+                 canvas.height = container.offsetHeight * ratio;
+                 canvas.getContext("2d").scale(ratio, ratio);
+                 if (signaturePad) signaturePad.clear(); // 清除舊內容
+            }
+        }
+
+        // 監聽視窗大小改變
+        window.addEventListener("resize", () => {
+            if (!modal.classList.contains('hidden')) {
+                resizeCanvas();
+            }
+        });
     </script>
 </body>
 </html>
